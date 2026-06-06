@@ -1,4 +1,4 @@
-package com.example.models;
+package com.project.models;
 
 public enum TipoSaldo {
 DEVEDOR, ACREEDOR

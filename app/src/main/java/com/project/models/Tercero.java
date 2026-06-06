@@ -1,4 +1,4 @@
-package com.example.models;
+package com.project.models;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

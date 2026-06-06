@@ -1,13 +1,13 @@
-package com.example.base.ui;
+package com.project.base.ui;
 
 import java.math.BigDecimal;
 
 import org.springframework.data.domain.Sort;
 
-import com.example.models.SituacionIVA;
-import com.example.models.Tercero;
-import com.example.models.TipoSaldo;
-import com.example.repositories.TerceroRepository;
+import com.project.models.SituacionIVA;
+import com.project.models.Tercero;
+import com.project.models.TipoSaldo;
+import com.project.repositories.TerceroRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;

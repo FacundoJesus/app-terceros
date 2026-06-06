@@ -1,12 +1,12 @@
-package com.example.base.ui;
+package com.project.base.ui;
 
 import java.util.Collections;
-import com.example.models.Factura;
-import com.example.models.FacturaItem;
-import com.example.models.Facultad;
-import com.example.models.Tercero;
-import com.example.repositories.TerceroRepository;
-import com.example.repositories.FacturaRepository;
+
+import com.project.models.Factura;
+import com.project.models.FacturaItem;
+import com.project.models.Tercero;
+import com.project.repositories.FacturaRepository;
+import com.project.repositories.TerceroRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;

@@ -1,10 +1,10 @@
-package com.example.base.ui;
+package com.project.base.ui;
 
 
 import org.springframework.data.domain.Sort;
 
-import com.example.models.Facultad;
-import com.example.repositories.FacultadRepository;
+import com.project.models.Facultad;
+import com.project.repositories.FacultadRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;

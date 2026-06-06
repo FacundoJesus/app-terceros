@@ -1,9 +1,9 @@
-package com.example.base.ui;
+package com.project.base.ui;
 
 
-import com.example.repositories.FacturaRepository;
-import com.example.repositories.FacultadRepository;
-import com.example.repositories.TerceroRepository;
+import com.project.repositories.FacturaRepository;
+import com.project.repositories.FacultadRepository;
+import com.project.repositories.TerceroRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H1;
@@ -29,19 +29,15 @@ public class InicioView extends VerticalLayout {
         setPadding(true);
         setSpacing(true);
 
-        getStyle()
-                .set("padding", "40px");
+        getStyle().set("padding", "40px");
 
-        setDefaultHorizontalComponentAlignment(
-                Alignment.CENTER);
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         // ================= TITULO =================
 
         H1 titulo = new H1("Dashboard");
 
-        Span subtitulo = new Span(
-                "Bienvenido al Sistema de Gestión"
-        );
+        Span subtitulo = new Span("Bienvenido al Sistema de Gestión");
 
         subtitulo.getStyle()
                 .set("opacity", "0.7")
@@ -104,52 +100,30 @@ public class InicioView extends VerticalLayout {
 
         H3 accesosTitulo = new H3("Accesos rápidos");
 
-        Button btnFacultades = new Button(
-                "Facultades",
-                VaadinIcon.BUILDING.create()
-        );
+        Button btnFacultades = new Button("Facultades",VaadinIcon.BUILDING.create());
 
-        Button btnTerceros = new Button(
-                "Terceros",
-                VaadinIcon.USERS.create()
-        );
+        Button btnTerceros = new Button("Terceros",VaadinIcon.USERS.create());
 
-        Button btnFacturas = new Button(
-                "Facturas",
-                VaadinIcon.FILE_TEXT.create()
-        );
+        Button btnFacturas = new Button("Facturas",VaadinIcon.FILE_TEXT.create());
 
-        Button btnPagos = new Button(
-                "Pagos",
-                VaadinIcon.MONEY.create()
-        );
+        Button btnPagos = new Button("Pagos",VaadinIcon.MONEY.create());
 
         btnFacultades.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnTerceros.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnFacturas.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnPagos.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        btnFacultades.addClickListener(e ->
-                getUI().ifPresent(ui -> ui.navigate("facultades")));
+        btnFacultades.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("facultades")));
 
-        btnTerceros.addClickListener(e ->
-                getUI().ifPresent(ui -> ui.navigate("terceros")));
+        btnTerceros.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("terceros")));
 
-        btnFacturas.addClickListener(e ->
-                getUI().ifPresent(ui -> ui.navigate("facturas")));
+        btnFacturas.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("facturas")));
 
-        btnPagos.addClickListener(e ->
-                getUI().ifPresent(ui -> ui.navigate("pagos")));
+        btnPagos.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("pagos")));
 
-        HorizontalLayout accesos = new HorizontalLayout(
-                btnFacultades,
-                btnTerceros,
-                btnFacturas,
-                btnPagos
-        );
+        HorizontalLayout accesos = new HorizontalLayout(btnFacultades, btnTerceros, btnFacturas, btnPagos);
 
-        accesos.setJustifyContentMode(
-                JustifyContentMode.CENTER);
+        accesos.setJustifyContentMode(JustifyContentMode.CENTER);
         
         accesos.setSpacing(true);
         accesos.getStyle().set("gap", "40px");
@@ -157,9 +131,7 @@ public class InicioView extends VerticalLayout {
 
         // ================= MENSAJE =================
 
-        Span mensaje = new Span(
-                "Utilice los accesos rápidos para administrar facultades, terceros, facturas y pagos."
-        );
+        Span mensaje = new Span("Utilice los accesos rápidos para administrar facultades, terceros, facturas y pagos.");
 
         mensaje.getStyle()
                 .set("margin-top", "20px")
@@ -169,12 +141,7 @@ public class InicioView extends VerticalLayout {
         add(mensaje);
     }
 
-    private VerticalLayout crearCard(
-            String titulo,
-            String valor,
-            VaadinIcon icono,
-            String ruta
-    ) {
+    private VerticalLayout crearCard(String titulo,String valor, VaadinIcon icono, String ruta) {
 
     	Icon icon = icono.create();
 
@@ -215,7 +182,6 @@ public class InicioView extends VerticalLayout {
 
         card.setSpacing(false);
 
-
         card.addClassName("dashboard-card");
 
         card.addClickListener(e ->
@@ -223,4 +189,6 @@ public class InicioView extends VerticalLayout {
 
         return card;
     }
+    
+    
 }
