@@ -117,19 +117,17 @@ public class FacultadView extends VerticalLayout {
             return;
         }
         
-        Facultad f = new Facultad();
+        facultadActual.setNombre(tfNombre.getValue());
+        facultadActual.setDireccion(tfDireccion.getValue());
+        facultadActual.setCuit(tfCuit.getValue());
+        facultadActual.setSucursal(ifSucursal.getValue());
+        facultadActual.setTelefonos(tfTelefonos.getValue());
+        facultadActual.setCorreos(tfCorreos.getValue());
+        facultadActual.setDefecto(cbDefecto.getValue());
 
-        f.setNombre(tfNombre.getValue());
-        f.setDireccion(tfDireccion.getValue());
-        f.setCuit(tfCuit.getValue());
-        f.setSucursal(ifSucursal.getValue());
-        f.setTelefonos(tfTelefonos.getValue());
-        f.setCorreos(tfCorreos.getValue());
-        f.setDefecto(cbDefecto.getValue());
+        if (!validarFacultad(facultadActual)) return;
 
-        if (!validarFacultad(f)) return;
-
-        facultadRepository.save(f);
+        facultadRepository.save(facultadActual);
 
         actualizarGrid(tfBuscar.getValue());
         showNotificacion("Facultad actualizada correctamente", NotificationVariant.LUMO_SUCCESS);
@@ -259,7 +257,6 @@ public class FacultadView extends VerticalLayout {
         tfTelefonos.clear();
         tfCorreos.clear();
         cbDefecto.clear();
-        tfBuscar.clear();
 
         grid.deselectAll();
     }

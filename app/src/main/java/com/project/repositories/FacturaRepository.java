@@ -13,13 +13,15 @@ import com.project.models.Factura;
 
 @Repository
 public interface FacturaRepository extends JpaRepository<Factura, Long> {
+	
 	@Query("""
 			SELECT DISTINCT f
 			FROM Factura f
 			LEFT JOIN FETCH f.tercero
 			LEFT JOIN FETCH f.items
+			ORDER BY f.id
 			""")
-			List<Factura> findAllWithDetails();
+	List<Factura> findAllWithDetails();
 	
 	@Query("""
 		    SELECT f FROM Factura f
@@ -27,5 +29,5 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
 		    LEFT JOIN FETCH f.items
 		    WHERE LOWER(t.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))
 		""")
-		List<Factura> findByTerceroName(@Param("nombre") String nombre);
+	List<Factura> findByTerceroName(@Param("nombre") String nombre);
 }

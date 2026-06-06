@@ -102,7 +102,7 @@ public class TerceroView extends VerticalLayout {
         nuevoTercero.setSaldoApertura(tfSaldo.getValue() != null ? BigDecimal.valueOf(tfSaldo.getValue()): null);
         nuevoTercero.setTipoSaldo(cbTipoSaldo.getValue());
     	
-        if (!validar()) return;
+        if (!validarTercero(terceroActual)) return;
 
         if (terceroRepository.existsByCuitl(nuevoTercero.getCuitl())) {
             showNotificacion("Ya existe un tercero con ese CUIT", NotificationVariant.LUMO_ERROR);
@@ -122,23 +122,20 @@ public class TerceroView extends VerticalLayout {
             showNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
             return;
         }
-
-        Tercero tercero = new Tercero();
+      
+        terceroActual.setNombre(tfNombre.getValue());
+        terceroActual.setCuitl(tfCuitl.getValue());
+        terceroActual.setSitiva(cbSituacionIva.getValue());
+        terceroActual.setDireccion(tfDireccion.getValue());
+        terceroActual.setLocalidad(tfLocalidad.getValue());
+        terceroActual.setProvincia(tfProvincia.getValue());
+        terceroActual.setTelefonos(tfTelefonos.getValue());
+        terceroActual.setSaldoApertura(tfSaldo.getValue() != null ? BigDecimal.valueOf(tfSaldo.getValue()): null);
+        terceroActual.setTipoSaldo(cbTipoSaldo.getValue());
         
-        tercero.setNombre(tfNombre.getValue());
-        tercero.setCuitl(tfCuitl.getValue());
-        tercero.setSitiva(cbSituacionIva.getValue());
-        tercero.setDireccion(tfDireccion.getValue());
-        tercero.setLocalidad(tfLocalidad.getValue());
-        tercero.setProvincia(tfProvincia.getValue());
-        tercero.setTelefonos(tfTelefonos.getValue());
-        tercero.setSaldoApertura(tfSaldo.getValue() != null ? BigDecimal.valueOf(tfSaldo.getValue()): null);
-        tercero.setTipoSaldo(cbTipoSaldo.getValue());
+        if (!validarTercero(terceroActual)) return;
         
-        if (!validar()) return;
-        
-
-        terceroRepository.save(tercero);
+        terceroRepository.save(terceroActual);
 
         actualizarGrid(tfBuscar.getValue());
         showNotificacion("Tercero actualizado", NotificationVariant.LUMO_SUCCESS);
@@ -242,26 +239,7 @@ public class TerceroView extends VerticalLayout {
         add(buscadorLayout);
     }
     
-    
-    private void mapearTercero(Tercero t) {
-        t.setNombre(tfNombre.getValue());
-        t.setCuitl(tfCuitl.getValue());
-        t.setSitiva(cbSituacionIva.getValue());
-        t.setDireccion(tfDireccion.getValue());
-        t.setLocalidad(tfLocalidad.getValue());
-        t.setProvincia(tfProvincia.getValue());
-        t.setTelefonos(tfTelefonos.getValue());
-
-        t.setSaldoApertura(
-        	    tfSaldo.getValue() != null
-        	        ? BigDecimal.valueOf(tfSaldo.getValue())
-        	        : null
-        	);
-
-        t.setTipoSaldo(cbTipoSaldo.getValue());
-    }
-
-    
+       
     private void cargarFormulario(Tercero t) {
         tfNombre.setValue(t.getNombre() != null ? t.getNombre() : "");
         tfCuitl.setValue(t.getCuitl() != null ? t.getCuitl() : "");
@@ -275,27 +253,18 @@ public class TerceroView extends VerticalLayout {
     }
 
     
-    private boolean validar() {
-
-        Tercero t = new Tercero();
-        mapearTercero(t);
-
-        var errores = validator.validate(t);
+    private boolean validarTercero(Tercero t) {
+    	
+    	var errores = validator.validate(t);
 
         if (!errores.isEmpty()) {
-
         	String mensaje = errores.stream()
         	        .map(e -> "<li>" + e.getMessage() + "</li>")
         	        .collect(java.util.stream.Collectors.joining());
 
-        	showNotificacion(
-        	        "<b>Se encontraron errores:</b><ul>" + mensaje + "</ul>",
-        	        NotificationVariant.LUMO_ERROR
-        	);
-
+        	showNotificacion("<b>Se encontraron errores:</b><ul>" + mensaje + "</ul>", NotificationVariant.LUMO_ERROR);
             return false;
         }
-
         return true;
     }
 
@@ -317,13 +286,13 @@ public class TerceroView extends VerticalLayout {
     }
 
     
-    private void actualizarGrid(String filtro) {
+    private void actualizarGrid(String filtroNombre) {
 
-        if (filtro == null || filtro.isBlank()) {
+        if (filtroNombre == null || filtroNombre.isBlank()) {
             grid.setItems(terceroRepository.findAll(Sort.by("id").ascending()));
             return;
         }
-        grid.setItems(terceroRepository.findByNombreContainingIgnoreCaseOrderByIdAsc(filtro));
+        grid.setItems(terceroRepository.findByNombreContainingIgnoreCaseOrderByIdAsc(filtroNombre));
     }
 
     
