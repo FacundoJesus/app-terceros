@@ -35,3 +35,24 @@ html {
 html[theme="light"] {
     color-scheme: light;
 }
+
+
+.dashboard-card {
+    padding: 30px;
+    min-height: 220px;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+
+    transition: all 0.25s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.35),
+        0 0 15px rgba(59, 130, 246, 0.20);
+}
+

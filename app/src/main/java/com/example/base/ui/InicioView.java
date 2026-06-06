@@ -8,6 +8,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -15,7 +16,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-//prueba 2
+
 @Route(value = "", layout = MainLayout.class)
 @PageTitle("Inicio")
 @Menu(order = 0, icon = "vaadin:home")
@@ -151,7 +152,9 @@ public class InicioView extends VerticalLayout {
 
         accesos.setJustifyContentMode(
                 JustifyContentMode.CENTER);
-
+        
+        accesos.setSpacing(true);
+        accesos.getStyle().set("gap", "40px");
         add(accesosTitulo, accesos);
 
         // ================= MENSAJE =================
@@ -175,22 +178,28 @@ public class InicioView extends VerticalLayout {
             String ruta
     ) {
 
-        Span icon = new Span(icono.create());
+    	Icon icon = icono.create();
+
+    	icon.setSize("60px");
 
         icon.getStyle()
-                .set("font-size", "42px")
+                .set("font-size", "60px")
                 .set("margin-bottom", "10px");
 
+        
         H3 tituloCard = new H3(titulo);
 
         tituloCard.getStyle()
-                .set("margin", "0");
+                .set("margin", "0")
+        		.set("font-size", "20px");
+        
 
         Span valorCard = new Span(valor);
 
         valorCard.getStyle()
                 .set("font-size", "3.5rem")
-                .set("font-weight", "700");
+                .set("font-weight", "700")
+                .set("margin-top", "20px");
 
         VerticalLayout card = new VerticalLayout(
                 icon,
@@ -208,13 +217,6 @@ public class InicioView extends VerticalLayout {
 
         card.setSpacing(false);
 
-        card.getStyle()
-                .set("padding", "30px")
-                .set("min-height", "220px")
-                .set("border-radius", "15px")
-                .set("background", "rgba(255,255,255,0.05)")
-                .set("border", "1px solid rgba(255,255,255,0.08)")
-                .set("cursor", "pointer");
 
         card.addClassName("dashboard-card");
 
