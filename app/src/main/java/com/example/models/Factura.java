@@ -46,6 +46,7 @@ public class Factura {
 
 	// PROVEEDOR-TERCERO
 	@ToString.Exclude
+	@NotNull(message = "Debe seleccionar un tercero")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
         name = "id_tercero",

@@ -56,6 +56,9 @@ public class TerceroView extends VerticalLayout {
     private TextField tfBuscar = new TextField();
 
     public TerceroView(TerceroRepository repository, Validator validator) {
+    	
+    	setSizeFull();
+    	
         this.terceroRepository = repository;
         this.validator = validator;
 

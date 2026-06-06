@@ -21,6 +21,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
@@ -46,13 +47,14 @@ public class FacturaView extends VerticalLayout {
 
     // ================= FORM CABECERA =================
     private DatePicker dpFecha = new DatePicker("Fecha");
-    private TextField tfNumero = new TextField("Número");
+    private IntegerField tfNumero = new IntegerField("Número");
     private ComboBox<Tercero> cbTercero = new ComboBox<>("Tercero");
 
     private TextField tfBuscar = new TextField();
     
     public FacturaView(FacturaRepository facturaRepository, TerceroRepository terceroRepository, Validator validator) {
-
+    	setSizeFull();
+    	
         this.facturaRepository = facturaRepository;
         this.terceroRepository = terceroRepository;
         this.validator = validator;
@@ -65,20 +67,8 @@ public class FacturaView extends VerticalLayout {
 
 
         // ================= BUSCADOR =================
-        tfBuscar.setPlaceholder("Buscar por nombre...");
-        tfBuscar.setClearButtonVisible(true);
+        configurarBuscador();
 
-        // ancho controlado
-        tfBuscar.setWidth("33%");
-
-        tfBuscar.addValueChangeListener(e -> actualizarGridFacturas(e.getValue()));
-
-        HorizontalLayout buscadorLayout = new HorizontalLayout(tfBuscar);
-        buscadorLayout.setWidthFull();
-        buscadorLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
-        buscadorLayout.setAlignItems(FlexComponent.Alignment.START);
-
-        add(buscadorLayout);
 
 
         // ================= GRID FACTURAS =================
@@ -101,8 +91,81 @@ public class FacturaView extends VerticalLayout {
         actualizarGridFacturas(null);
     }
     
-    private void cargarFormulario() {
+    
+    
+    // ================= CRUD =================
+    private void agregarFactura() {
 
+        Factura f = new Factura();
+
+        f.setNumeroFactura(tfNumero.getValue());
+        f.setFechaFactura(dpFecha.getValue());
+        f.setTercero(cbTercero.getValue());
+
+        if (!validarFactura(f)) return;
+
+        facturaRepository.save(f);
+
+        showNotificacion("Factura agregada", NotificationVariant.LUMO_SUCCESS);
+        limpiarFormulario();
+        actualizarGridFacturas(null);
+    }
+    
+    private void actualizarFactura() {
+
+        if (facturaActual.getId() == null) {
+            showNotificacion("Debes seleccionar una Factura", NotificationVariant.LUMO_WARNING);
+            return;
+        }
+
+        facturaActual.setNumeroFactura(tfNumero.getValue());
+        facturaActual.setFechaFactura(dpFecha.getValue());
+        facturaActual.setTercero(cbTercero.getValue());
+
+        if (!validarFactura(facturaActual)) return;
+
+        facturaRepository.save(facturaActual);
+
+        showNotificacion("Factura actualizada", NotificationVariant.LUMO_SUCCESS);
+        limpiarFormulario();
+        actualizarGridFacturas(null);
+    }
+    
+    
+    private void eliminarFactura() {
+        if (facturaActual.getId() == null) {
+        	showNotificacion("Debes seleccionar una Factura",NotificationVariant.LUMO_WARNING);
+        	return;
+        }
+
+        facturaRepository.delete(facturaActual);
+
+        showNotificacion("Factura eliminada",NotificationVariant.LUMO_SUCCESS);
+        limpiarFormulario();
+        actualizarGridFacturas(null);
+    }  
+    
+    
+    // ================= HELPERS =================
+    
+    private void configurarBuscador() {
+        tfBuscar.setPlaceholder("Buscar Factura por nombre...");
+        tfBuscar.setClearButtonVisible(true);
+
+        // ancho controlado
+        tfBuscar.setWidth("33%");
+
+        tfBuscar.addValueChangeListener(e -> actualizarGridFacturas(e.getValue()));
+
+        HorizontalLayout buscadorLayout = new HorizontalLayout(tfBuscar);
+        buscadorLayout.setWidthFull();
+        buscadorLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        buscadorLayout.setAlignItems(FlexComponent.Alignment.START);
+
+        add(buscadorLayout);
+    }
+    
+    private void cargarFormulario() {
         cbTercero.setItems(terceroRepository.findAll());
         cbTercero.setItemLabelGenerator(Tercero::getNombre);
 
@@ -117,7 +180,6 @@ public class FacturaView extends VerticalLayout {
     }
     
     private void configurarGridFacturas() {
-
         gridFacturas.addColumn(Factura::getId).setHeader("ID");
         gridFacturas.addColumn(Factura::getFechaFactura).setHeader("Fecha");
         gridFacturas.addColumn(Factura::getNumeroFactura).setHeader("Número");
@@ -135,7 +197,6 @@ public class FacturaView extends VerticalLayout {
     } 
     
     private void configurarGridItems() {
-
         gridItems.addColumn(FacturaItem::getDetalle).setHeader("Detalle");
         gridItems.addColumn(FacturaItem::getCantidad).setHeader("Cantidad");
         gridItems.addColumn(FacturaItem::getMonto).setHeader("Monto");
@@ -144,19 +205,20 @@ public class FacturaView extends VerticalLayout {
     }
     
     private void actualizarGridFacturas(String filtro) {
-
         if (filtro == null || filtro.isBlank()) {
             gridFacturas.setItems(facturaRepository.findAllWithDetails());
         } else {
             gridFacturas.setItems(
-                facturaRepository.buscarPorNombreTercero(filtro)
-            );
+                facturaRepository.findByTerceroName(filtro));
         }
+        facturaActual = null;
+        gridFacturas.deselectAll();
+        gridItems.setItems(Collections.emptyList());
     }
     
     private void cargarFactura(Factura f) {
         dpFecha.setValue(f.getFechaFactura());
-        tfNumero.setValue(f.getNumeroFactura() != null ? f.getNumeroFactura().toString() : "");
+        tfNumero.setValue(f.getNumeroFactura());
         cbTercero.setValue(f.getTercero());
     }
 
@@ -165,7 +227,6 @@ public class FacturaView extends VerticalLayout {
     }
     
     private void configurarBotones() {
-
         Button btnAgregar = new Button("Agregar", e -> agregarFactura());
         btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.PRIMARY);
 
@@ -178,12 +239,7 @@ public class FacturaView extends VerticalLayout {
         Button btnLimpiar = new Button("Limpiar Formulario", e -> limpiarFormulario());
         btnLimpiar.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
 
-        HorizontalLayout acciones = new HorizontalLayout(
-                btnAgregar,
-                btnActualizar,
-                btnEliminar,
-                btnLimpiar
-        );
+        HorizontalLayout acciones = new HorizontalLayout(btnAgregar,btnActualizar,btnEliminar,btnLimpiar);
 
         acciones.setWidthFull();
         acciones.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
@@ -235,55 +291,27 @@ public class FacturaView extends VerticalLayout {
         n.open();
     }
     
-    // ================= CRUD =================
-    private void agregarFactura() {
-    	
-        Factura f = new Factura();
-        //VALIDATOR
-        f.setFechaFactura(dpFecha.getValue());
-        f.setNumeroFactura(tfNumero.getValue().isBlank() ? null : Integer.parseInt(tfNumero.getValue()));
-        f.setTercero(cbTercero.getValue());
+    private boolean validarFactura(Factura f) {
 
-        facturaRepository.save(f);
+        var errores = validator.validate(f);
 
-        showNotificacion("Factura agregada",NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();
-        actualizarGridFacturas(null);
-    }
-    
-    private void actualizarFactura() {
-    	
-    	
-        if (facturaActual.getId() == null) {
-        	showNotificacion("Debes seleccionar una Factura",NotificationVariant.LUMO_WARNING);
-        	return;
-        }
-        //VALIDATOR
-        facturaActual.setFechaFactura(dpFecha.getValue());
-        facturaActual.setNumeroFactura(
-                tfNumero.getValue().isBlank() ? null : Integer.parseInt(tfNumero.getValue())
-        );
-        facturaActual.setTercero(cbTercero.getValue());
+        if (!errores.isEmpty()) {
 
-        facturaRepository.save(facturaActual);
+            String mensaje = errores.stream()
+                    .map(e -> "<li>" + e.getMessage() + "</li>")
+                    .collect(java.util.stream.Collectors.joining());
 
-        showNotificacion("Factura actualizada",NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();
-        actualizarGridFacturas(null);
-    }
-    
-    private void eliminarFactura() {
-        if (facturaActual.getId() == null) {
-        	showNotificacion("Debes seleccionar una Factura",NotificationVariant.LUMO_WARNING);
-        	return;
+            showNotificacion(
+                    "<b>Errores:</b><ul>" + mensaje + "</ul>",
+                    NotificationVariant.LUMO_ERROR
+            );
+
+            return false;
         }
 
-        facturaRepository.delete(facturaActual);
-
-        showNotificacion("Factura eliminada",NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();
-        actualizarGridFacturas(null);
-    }  
+        return true;
+    }
+    
      
 }
     

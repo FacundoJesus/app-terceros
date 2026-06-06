@@ -27,5 +27,5 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
 		    LEFT JOIN FETCH f.items
 		    WHERE LOWER(t.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))
 		""")
-		List<Factura> buscarPorNombreTercero(@Param("nombre") String nombre);
+		List<Factura> findByTerceroName(@Param("nombre") String nombre);
 }
