@@ -62,6 +62,7 @@ public final class MainLayout extends AppLayout {
             });
         });
 
+        
         HorizontalLayout header = new HorizontalLayout();
 
         header.setWidthFull();
@@ -103,6 +104,7 @@ public final class MainLayout extends AppLayout {
             Component icon = null;
             if (menuEntry.icon().contains(".svg")) {
                 icon = new SvgIcon(menuEntry.icon());
+                
             } else {
                 icon = new Icon(menuEntry.icon());
             }

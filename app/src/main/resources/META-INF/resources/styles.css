@@ -1,4 +1,28 @@
-/* Add your styles here */
+
+/* =========================
+   GLOBAL / THEME BASE
+========================= */
+
+html {
+    color-scheme: dark;
+
+    /* DARK por defecto */
+    --card-hover-shadow: 0 8px 30px rgba(168,85,247,.40);
+
+    --aura-accent-color-light: var(--aura-orange);
+    --aura-accent-color-dark: var(--aura-purple);
+}
+
+/* LIGHT MODE (controlado por Vaadin theme attribute) */
+html[theme="light"] {
+    color-scheme: light;
+
+    --card-hover-shadow: 0 8px 30px rgba(255,140,0,.35);
+}
+
+/* =========================
+   APP HEADER
+========================= */
 
 .app-logo {
     border-radius: min(40%, var(--vaadin-radius-m));
@@ -15,7 +39,10 @@
     font-size: var(--aura-font-size-s);
 }
 
-/* TODO: This is only for demo purposes. You can delete it. */
+/* =========================
+   SIDE NAV DEMO TEXT
+========================= */
+
 vaadin-side-nav:has(vaadin-side-nav-item:only-child)::after {
     display: block;
     content: "More menu items will appear here when you add more views.";
@@ -28,31 +55,34 @@ vaadin-side-nav:has(vaadin-side-nav-item:only-child)::after {
     white-space: normal;
 }
 
-html {
-    color-scheme: dark;
+/* =========================
+   ICONS
+========================= */
+
+vaadin-side-nav-item vaadin-icon {
+    width: 35px;
+    height: 35px;
 }
 
-html[theme="light"] {
-    color-scheme: light;
-}
-
+/* =========================
+   DASHBOARD CARD
+========================= */
 
 .dashboard-card {
     padding: 30px;
     min-height: 220px;
     border-radius: 15px;
+
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.08);
+
     cursor: pointer;
 
-    transition: all 0.25s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .dashboard-card:hover {
-    transform: translateY(-4px);
-
-    box-shadow:
-        0 8px 25px rgba(0, 0, 0, 0.35),
-        0 0 15px rgba(59, 130, 246, 0.20);
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: var(--card-hover-shadow) !important;
 }
 

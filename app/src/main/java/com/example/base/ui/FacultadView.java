@@ -1,11 +1,9 @@
 package com.example.base.ui;
 
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
 
 import com.example.models.Facultad;
-import com.example.models.Tercero;
 import com.example.repositories.FacultadRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

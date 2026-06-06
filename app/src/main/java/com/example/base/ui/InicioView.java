@@ -197,7 +197,7 @@ public class InicioView extends VerticalLayout {
         Span valorCard = new Span(valor);
 
         valorCard.getStyle()
-                .set("font-size", "3.5rem")
+                .set("font-size", "40px")
                 .set("font-weight", "700")
                 .set("margin-top", "20px");
 

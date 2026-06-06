@@ -9,7 +9,7 @@ import com.example.models.Facultad;
 
 @Repository
 public interface FacultadRepository extends JpaRepository<Facultad, Long> {
+	
     List<Facultad> findByNombreContainingIgnoreCase(String nombre);
-
     boolean existsByCuit(String cuit);
 }
