@@ -29,9 +29,9 @@ vaadin-side-nav:has(vaadin-side-nav-item:only-child)::after {
 }
 
 html {
-    color-scheme: light;
+    color-scheme: dark;
 }
 
-html[theme="dark"] {
-    color-scheme: dark;
+html[theme="light"] {
+    color-scheme: light;
 }

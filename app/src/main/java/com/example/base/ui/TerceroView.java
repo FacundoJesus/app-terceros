@@ -263,6 +263,8 @@ public class TerceroView extends VerticalLayout {
         tfTelefonos.clear();
         tfSaldo.clear();
         cbTipoSaldo.clear();
+        
+        grid.deselectAll();
     }
 
     

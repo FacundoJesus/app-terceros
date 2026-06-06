@@ -45,11 +45,11 @@ public final class MainLayout extends AppLayout {
             UI.getCurrent().getPage().executeJs("""
                 const html = document.documentElement;
 
-                if (html.getAttribute('theme') === 'dark') {
+                if (html.getAttribute('theme') === 'light') {
                     html.removeAttribute('theme');
                     return false;
                 } else {
-                    html.setAttribute('theme', 'dark');
+                    html.setAttribute('theme', 'light');
                     return true;
                 }
             """).then(Boolean.class, dark -> {

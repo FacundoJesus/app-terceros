@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -31,8 +32,8 @@ public class Facultad {
 	@Column(name="cuit")
 	private String cuit;
 	
-	@NotBlank(message="La sucursal de la Facultad es obligatoria")
-	@Column(name="sucursal")
+	@NotNull(message = "La sucursal de la Facultad es obligatoria")
+	@Column(name = "sucursal")
 	private Integer sucursal;
 	
 	@Column(name="telefonos")
@@ -41,7 +42,8 @@ public class Facultad {
 	@Column(name="email")
 	private String correos;
 	
-	@Column(name="defecto")
+
+	@Column(name = "defecto")
 	private Boolean defecto;
 	
 
