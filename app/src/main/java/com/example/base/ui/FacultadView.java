@@ -37,14 +37,14 @@ public class FacultadView extends VerticalLayout {
 
     private Grid<Facultad> grid = new Grid<>(Facultad.class, false);
 
-    private Facultad f = new Facultad();
+    private Facultad facultadActual = new Facultad();
 
     // ================= FORM =================
 
     private TextField tfNombre = new TextField("Nombre");
     private TextField tfDireccion = new TextField("Dirección");
     private TextField tfCuit = new TextField("CUIT");
-    private IntegerField tfSucursal = new IntegerField("Sucursal");
+    private IntegerField ifSucursal = new IntegerField("Sucursal");
     private TextField tfTelefonos = new TextField("Teléfonos");
     private TextField tfCorreos = new TextField("Correo");
     private Checkbox cbDefecto = new Checkbox("Facultad por defecto");
@@ -92,7 +92,7 @@ public class FacultadView extends VerticalLayout {
         nuevaFacultad.setNombre(tfNombre.getValue());
         nuevaFacultad.setDireccion(tfDireccion.getValue());
         nuevaFacultad.setCuit(tfCuit.getValue());
-        nuevaFacultad.setSucursal(tfSucursal.getValue());
+        nuevaFacultad.setSucursal(ifSucursal.getValue());
         nuevaFacultad.setTelefonos(tfTelefonos.getValue());
         nuevaFacultad.setCorreos(tfCorreos.getValue());
         nuevaFacultad.setDefecto(cbDefecto.getValue());
@@ -114,12 +114,17 @@ public class FacultadView extends VerticalLayout {
 
     private void actualizarFacultad() {
 
+        if ( facultadActual == null || facultadActual.getId() == null) {
+            showNotificacion("Seleccione una facultad", NotificationVariant.LUMO_WARNING);
+            return;
+        }
+        
         Facultad f = new Facultad();
 
         f.setNombre(tfNombre.getValue());
         f.setDireccion(tfDireccion.getValue());
         f.setCuit(tfCuit.getValue());
-        f.setSucursal(tfSucursal.getValue());
+        f.setSucursal(ifSucursal.getValue());
         f.setTelefonos(tfTelefonos.getValue());
         f.setCorreos(tfCorreos.getValue());
         f.setDefecto(cbDefecto.getValue());
@@ -135,12 +140,12 @@ public class FacultadView extends VerticalLayout {
 
     private void eliminarFacultad() {
 
-        if (f.getId() == null) {
+        if (facultadActual == null || facultadActual.getId() == null) {
             showNotificacion("Seleccione una facultad", NotificationVariant.LUMO_WARNING);
             return;
         }
 
-        facultadRepository.delete(f);
+        facultadRepository.delete(facultadActual);
         
         showNotificacion("Facultad eliminada correctamente", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
@@ -152,7 +157,7 @@ public class FacultadView extends VerticalLayout {
     // ================= HELPERS =================
     
     private void configurarBuscador() {
-        tfBuscar.setPlaceholder("Buscar por nombre...");
+        tfBuscar.setPlaceholder("Buscar Facultad por nombre...");
         tfBuscar.setClearButtonVisible(true);
 
         // ancho controlado
@@ -174,7 +179,7 @@ public class FacultadView extends VerticalLayout {
                 tfNombre,
                 tfDireccion,
                 tfCuit,
-                tfSucursal,
+                ifSucursal,
                 tfTelefonos,
                 tfCorreos,
                 cbDefecto
@@ -197,8 +202,8 @@ public class FacultadView extends VerticalLayout {
         grid.addColumn(Facultad::getDefecto).setHeader("Por Defecto");
         
         grid.asSingleSelect().addValueChangeListener(e -> {
-            f = e.getValue();
-            if (f != null) cargarFormulario(f);
+            facultadActual = e.getValue();
+            if (facultadActual != null) cargarFormulario(facultadActual);
         });
         
         add(grid);
@@ -228,43 +233,35 @@ public class FacultadView extends VerticalLayout {
         tfNombre.setValue(f.getNombre() != null ? f.getNombre() : "");
         tfDireccion.setValue(f.getDireccion() != null ? f.getDireccion() : "");
         tfCuit.setValue(f.getCuit() != null ? f.getCuit() : "");
-        tfSucursal.setValue(f.getSucursal());
+        ifSucursal.setValue(f.getSucursal());
         tfTelefonos.setValue(f.getTelefonos() != null ? f.getTelefonos() : "");
         tfCorreos.setValue(f.getCorreos() != null ? f.getCorreos() : "");
         cbDefecto.setValue(f.getDefecto() != null ? f.getDefecto() : false);
     }
 
     private boolean validarFacultad(Facultad f) {
-
         var errores = validator.validate(f);
-
         if (!errores.isEmpty()) {
-
             String mensaje = errores.stream()
                     .map(e -> "<li>" + e.getMessage() + "</li>")
                     .collect(java.util.stream.Collectors.joining());
-
-            showNotificacion(
-                    "<b>Se encontraron errores:</b><ul>" + mensaje + "</ul>",
-                    NotificationVariant.LUMO_ERROR
-            );
-
+            showNotificacion("<b>Se encontraron errores:</b><ul>" + mensaje + "</ul>",NotificationVariant.LUMO_ERROR);
             return false;
         }
-
         return true;
     }
 
     private void limpiarFormulario() {
-        f = new Facultad();
+        facultadActual = new Facultad();
 
         tfNombre.clear();
         tfDireccion.clear();
         tfCuit.clear();
-        tfSucursal.clear();
+        ifSucursal.clear();
         tfTelefonos.clear();
         tfCorreos.clear();
         cbDefecto.clear();
+        tfBuscar.clear();
 
         grid.deselectAll();
     }

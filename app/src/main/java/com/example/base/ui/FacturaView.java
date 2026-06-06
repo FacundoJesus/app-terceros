@@ -3,7 +3,7 @@ package com.example.base.ui;
 import java.util.Collections;
 import com.example.models.Factura;
 import com.example.models.FacturaItem;
-
+import com.example.models.Facultad;
 import com.example.models.Tercero;
 import com.example.repositories.TerceroRepository;
 import com.example.repositories.FacturaRepository;
@@ -45,16 +45,16 @@ public class FacturaView extends VerticalLayout {
 
     private Factura facturaActual = new Factura();
 
-    // ================= FORM CABECERA =================
+    // ================= FORM =================
     private DatePicker dpFecha = new DatePicker("Fecha");
-    private IntegerField tfNumero = new IntegerField("Número");
+    private IntegerField ifNumero = new IntegerField("Número");
     private ComboBox<Tercero> cbTercero = new ComboBox<>("Tercero");
 
     private TextField tfBuscar = new TextField();
     
     public FacturaView(FacturaRepository facturaRepository, TerceroRepository terceroRepository, Validator validator) {
-    	setSizeFull();
     	
+    	setSizeFull();
         this.facturaRepository = facturaRepository;
         this.terceroRepository = terceroRepository;
         this.validator = validator;
@@ -68,7 +68,6 @@ public class FacturaView extends VerticalLayout {
 
         // ================= BUSCADOR =================
         configurarBuscador();
-
 
 
         // ================= GRID FACTURAS =================
@@ -98,7 +97,7 @@ public class FacturaView extends VerticalLayout {
 
         Factura f = new Factura();
 
-        f.setNumeroFactura(tfNumero.getValue());
+        f.setNumeroFactura(ifNumero.getValue());
         f.setFechaFactura(dpFecha.getValue());
         f.setTercero(cbTercero.getValue());
 
@@ -113,18 +112,21 @@ public class FacturaView extends VerticalLayout {
     
     private void actualizarFactura() {
 
-        if (facturaActual.getId() == null) {
-            showNotificacion("Debes seleccionar una Factura", NotificationVariant.LUMO_WARNING);
-            return;
-        }
+    	if (facturaActual == null || facturaActual.getId() == null) {
+    	    showNotificacion("Debes seleccionar una Factura", NotificationVariant.LUMO_WARNING);
+    	    return;
+    	}
 
-        facturaActual.setNumeroFactura(tfNumero.getValue());
-        facturaActual.setFechaFactura(dpFecha.getValue());
-        facturaActual.setTercero(cbTercero.getValue());
+        Factura f = new Factura();
 
-        if (!validarFactura(facturaActual)) return;
+        f.setId(facturaActual.getId());
+        f.setNumeroFactura(ifNumero.getValue());
+        f.setFechaFactura(dpFecha.getValue());
+        f.setTercero(cbTercero.getValue());
 
-        facturaRepository.save(facturaActual);
+        if (!validarFactura(f)) return;
+
+        facturaRepository.save(f);
 
         showNotificacion("Factura actualizada", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
@@ -133,7 +135,7 @@ public class FacturaView extends VerticalLayout {
     
     
     private void eliminarFactura() {
-        if (facturaActual.getId() == null) {
+        if (facturaActual == null || facturaActual.getId() == null) {
         	showNotificacion("Debes seleccionar una Factura",NotificationVariant.LUMO_WARNING);
         	return;
         }
@@ -169,11 +171,7 @@ public class FacturaView extends VerticalLayout {
         cbTercero.setItems(terceroRepository.findAll());
         cbTercero.setItemLabelGenerator(Tercero::getNombre);
 
-        HorizontalLayout form = new HorizontalLayout(
-                dpFecha,
-                tfNumero,
-                cbTercero
-        );
+        HorizontalLayout form = new HorizontalLayout(dpFecha,ifNumero,cbTercero);
 
         form.setWidthFull();
         add(form);
@@ -200,7 +198,9 @@ public class FacturaView extends VerticalLayout {
         gridItems.addColumn(FacturaItem::getDetalle).setHeader("Detalle");
         gridItems.addColumn(FacturaItem::getCantidad).setHeader("Cantidad");
         gridItems.addColumn(FacturaItem::getMonto).setHeader("Monto");
-
+        
+        gridItems.setHeight("200px");
+        gridItems.setAllRowsVisible(false);
         add(gridItems);
     }
     
@@ -218,7 +218,11 @@ public class FacturaView extends VerticalLayout {
     
     private void cargarFactura(Factura f) {
         dpFecha.setValue(f.getFechaFactura());
-        tfNumero.setValue(f.getNumeroFactura());
+        if (f.getNumeroFactura() != null) {
+            ifNumero.setValue(f.getNumeroFactura());
+        } else {
+            ifNumero.clear();
+        }
         cbTercero.setValue(f.getTercero());
     }
 
@@ -252,9 +256,10 @@ public class FacturaView extends VerticalLayout {
         facturaActual = new Factura();
 
         dpFecha.clear();
-        tfNumero.clear();
+        ifNumero.clear();
         cbTercero.clear();
-
+        tfBuscar.clear();
+        
         gridItems.setItems(Collections.emptyList());
         gridFacturas.deselectAll();
     }
@@ -292,23 +297,14 @@ public class FacturaView extends VerticalLayout {
     }
     
     private boolean validarFactura(Factura f) {
-
         var errores = validator.validate(f);
-
         if (!errores.isEmpty()) {
-
             String mensaje = errores.stream()
                     .map(e -> "<li>" + e.getMessage() + "</li>")
                     .collect(java.util.stream.Collectors.joining());
-
-            showNotificacion(
-                    "<b>Errores:</b><ul>" + mensaje + "</ul>",
-                    NotificationVariant.LUMO_ERROR
-            );
-
+            showNotificacion("<b>Errores:</b><ul>" + mensaje + "</ul>",NotificationVariant.LUMO_ERROR);
             return false;
         }
-
         return true;
     }
     
