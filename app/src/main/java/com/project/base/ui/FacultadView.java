@@ -70,7 +70,7 @@ public class FacultadView extends VerticalLayout {
         configurarBuscador();
 
         // ================= GRID =================
-        configurarGridFacultad();
+        configurarGrid();
 
         // ================= FORM =================
         cargarFormulario();
@@ -78,8 +78,6 @@ public class FacultadView extends VerticalLayout {
         // ================= BOTONES =================
         configurarBotones();
 
-        
-        actualizarGrid(null);
     }
     
     
@@ -105,10 +103,10 @@ public class FacultadView extends VerticalLayout {
         }
        
         facultadRepository.save(nuevaFacultad);
-
+        
+        actualizarGrid(tfBuscar.getValue());
         showNotificacion("Facultad agregada correctamente",NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();
-        actualizarGrid(null);
+        limpiarFormulario();    
     }
     
 
@@ -133,9 +131,9 @@ public class FacultadView extends VerticalLayout {
 
         facultadRepository.save(f);
 
+        actualizarGrid(tfBuscar.getValue());
         showNotificacion("Facultad actualizada correctamente", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
-        actualizarGrid(null);
     }
 
     private void eliminarFacultad() {
@@ -147,9 +145,9 @@ public class FacultadView extends VerticalLayout {
 
         facultadRepository.delete(facultadActual);
         
+        actualizarGrid(tfBuscar.getValue());
         showNotificacion("Facultad eliminada correctamente", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
-        actualizarGrid(null);
     }
     
 
@@ -159,8 +157,6 @@ public class FacultadView extends VerticalLayout {
     private void configurarBuscador() {
         tfBuscar.setPlaceholder("Buscar Facultad por nombre...");
         tfBuscar.setClearButtonVisible(true);
-
-        // ancho controlado
         tfBuscar.setWidth("33%");
         
         tfBuscar.addValueChangeListener(e -> actualizarGrid(e.getValue()));
@@ -191,7 +187,7 @@ public class FacultadView extends VerticalLayout {
         add(form);
     }
     
-    private void configurarGridFacultad() {
+    private void configurarGrid() {
         grid.addColumn(Facultad::getId).setHeader("ID");
         grid.addColumn(Facultad::getNombre).setHeader("Nombre");
         grid.addColumn(Facultad::getDireccion).setHeader("Dirección");
@@ -200,6 +196,8 @@ public class FacultadView extends VerticalLayout {
         grid.addColumn(Facultad::getTelefonos).setHeader("Teléfonos");
         grid.addColumn(Facultad::getCorreos).setHeader("Correo");
         grid.addColumn(Facultad::getDefecto).setHeader("Por Defecto");
+        
+        actualizarGrid(null);
         
         grid.asSingleSelect().addValueChangeListener(e -> {
             facultadActual = e.getValue();
@@ -270,14 +268,9 @@ public class FacultadView extends VerticalLayout {
 
         if (filtro == null || filtro.isBlank()) {
             grid.setItems(facultadRepository.findAll(Sort.by("id").ascending()));
-        } else {
-            grid.setItems(facultadRepository
-                            .findByNombreContainingIgnoreCase(filtro)
-                            .stream()
-                            .sorted((a, b) -> a.getId().compareTo(b.getId()))
-                            .toList()
-            );
+            return;
         }
+        grid.setItems(facultadRepository.findByNombreContainingIgnoreCaseOrderByIdAsc(filtro));
     }
 
     

@@ -18,7 +18,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value = "", layout = MainLayout.class)
+@Route(value = "/", layout = MainLayout.class)
 @PageTitle("Inicio")
 @Menu(order = 0, icon = "vaadin:home")
 public class InicioView extends VerticalLayout {

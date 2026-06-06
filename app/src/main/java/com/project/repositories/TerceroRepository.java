@@ -11,7 +11,6 @@ import com.vaadin.flow.data.provider.DataProvider;
 @Repository
 public interface TerceroRepository extends JpaRepository<Tercero,Long>{
 
-	List<Tercero> findAllByOrderByIdAsc();
 	boolean existsByCuitl(String cuitl);
 	List<Tercero> findByNombreContainingIgnoreCaseOrderByIdAsc(String nombre);
 }

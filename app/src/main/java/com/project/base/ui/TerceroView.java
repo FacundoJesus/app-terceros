@@ -68,47 +68,120 @@ public class TerceroView extends VerticalLayout {
         titulo.getStyle().set("text-align", "center");
 
         add(titulo);
-
         // ================= BUSCADOR =================
-        tfBuscar.setPlaceholder("Buscar por nombre...");
-        tfBuscar.setClearButtonVisible(true);
-
-        // ancho controlado
-        tfBuscar.setWidth("33%");
-        //tfBuscar.setMaxWidth("640px");
-
-        tfBuscar.addValueChangeListener(e -> actualizarGrid(e.getValue()));
-
-        HorizontalLayout buscadorLayout = new HorizontalLayout(tfBuscar);
-        buscadorLayout.setWidthFull();
-        buscadorLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
-        buscadorLayout.setAlignItems(FlexComponent.Alignment.START);
-
-        add(buscadorLayout);
-
-        // ================= GRID =================
-        grid.addColumn(Tercero::getId).setHeader("ID");
-        grid.addColumn(Tercero::getNombre).setHeader("Nombre");
-        grid.addColumn(Tercero::getCuitl).setHeader("CUIT/L");
-        grid.addColumn(Tercero::getSitiva).setHeader("IVA");
-        grid.addColumn(Tercero::getDireccion).setHeader("Dirección");
-        grid.addColumn(Tercero::getLocalidad).setHeader("Localidad");
-        grid.addColumn(Tercero::getProvincia).setHeader("Provincia");
-        grid.addColumn(Tercero::getTelefonos).setHeader("Teléfonos");
-        grid.addColumn(Tercero::getSaldoApertura).setHeader("Saldo");
-        grid.addColumn(Tercero::getTipoSaldo).setHeader("Tipo Saldo");
         
-        actualizarGrid(null);
-
-        grid.asSingleSelect().addValueChangeListener(e -> {
-            terceroActual = e.getValue();
-            if (terceroActual != null) cargarFormulario(terceroActual);
-        });
-
-        add(grid);
+        configurarBuscador();
+        
+        // ================= GRID =================
+        
+        configurarGrid();
 
         // ================= FORM =================
-        cbTipoSaldo.setItems(TipoSaldo.values());
+        
+        configurarFormulario();
+        
+        // ================= BOTONES =================
+        
+        configurarBotones();  
+    }
+
+    
+    // ================= CRUD =================
+
+    private void agregarTercero() {
+
+    	Tercero nuevoTercero = new Tercero();
+    	
+        nuevoTercero.setNombre(tfNombre.getValue());
+        nuevoTercero.setCuitl(tfCuitl.getValue());
+        nuevoTercero.setSitiva(cbSituacionIva.getValue());
+        nuevoTercero.setDireccion(tfDireccion.getValue());
+        nuevoTercero.setLocalidad(tfLocalidad.getValue());
+        nuevoTercero.setProvincia(tfProvincia.getValue());
+        nuevoTercero.setTelefonos(tfTelefonos.getValue());
+        nuevoTercero.setSaldoApertura(tfSaldo.getValue() != null ? BigDecimal.valueOf(tfSaldo.getValue()): null);
+        nuevoTercero.setTipoSaldo(cbTipoSaldo.getValue());
+    	
+        if (!validar()) return;
+
+        if (terceroRepository.existsByCuitl(nuevoTercero.getCuitl())) {
+            showNotificacion("Ya existe un tercero con ese CUIT", NotificationVariant.LUMO_ERROR);
+            return;
+        }
+
+        terceroRepository.save(nuevoTercero);
+
+        actualizarGrid(tfBuscar.getValue());
+        showNotificacion("Tercero agregado", NotificationVariant.LUMO_SUCCESS);
+        limpiarFormulario();         
+    }
+
+    private void actualizarTercero() {
+
+        if (terceroActual == null || terceroActual.getId() == null) {
+            showNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
+            return;
+        }
+
+        Tercero tercero = new Tercero();
+        
+        tercero.setNombre(tfNombre.getValue());
+        tercero.setCuitl(tfCuitl.getValue());
+        tercero.setSitiva(cbSituacionIva.getValue());
+        tercero.setDireccion(tfDireccion.getValue());
+        tercero.setLocalidad(tfLocalidad.getValue());
+        tercero.setProvincia(tfProvincia.getValue());
+        tercero.setTelefonos(tfTelefonos.getValue());
+        tercero.setSaldoApertura(tfSaldo.getValue() != null ? BigDecimal.valueOf(tfSaldo.getValue()): null);
+        tercero.setTipoSaldo(cbTipoSaldo.getValue());
+        
+        if (!validar()) return;
+        
+
+        terceroRepository.save(tercero);
+
+        actualizarGrid(tfBuscar.getValue());
+        showNotificacion("Tercero actualizado", NotificationVariant.LUMO_SUCCESS);
+        limpiarFormulario();   
+    }
+
+    private void eliminarTercero() {
+
+        if (terceroActual.getId() == null) {
+            showNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
+            return;
+        }
+
+        terceroRepository.delete(terceroActual);
+
+        actualizarGrid(tfBuscar.getValue());
+        showNotificacion("Tercero eliminado", NotificationVariant.LUMO_SUCCESS);
+        limpiarFormulario();
+    }
+
+    // ================= HELPERS =================
+    
+    private void configurarBotones() {
+    	Button btnAgregar = new Button("Agregar", e -> agregarTercero());
+        btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.PRIMARY);
+
+        Button btnActualizar = new Button("Actualizar", e -> actualizarTercero());      
+        btnActualizar.addClassName("btn-actualizar");
+        
+        Button btnEliminar = new Button("Eliminar", e -> eliminarTercero());
+        btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
+        
+        Button btnLimpiarFormulario = new Button("Limpiar Formulario", e -> limpiarFormulario());
+        btnLimpiarFormulario.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        btnLimpiarFormulario.getStyle().set("margin-left", "30px");
+
+        HorizontalLayout acciones = new HorizontalLayout(btnAgregar, btnActualizar, btnEliminar, btnLimpiarFormulario);
+
+        add(acciones);
+    }
+    
+    private void configurarFormulario() {
+    	cbTipoSaldo.setItems(TipoSaldo.values());
         cbSituacionIva.setItems(SituacionIVA.values());
         FormLayout form = new FormLayout();
         form.add(
@@ -129,82 +202,46 @@ public class TerceroView extends VerticalLayout {
         );
 
         add(form);
-
-        // ================= BOTONES =================
-        Button btnAgregar = new Button("Agregar", e -> agregarTercero());
-        btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.PRIMARY);
-
-        Button btnActualizar = new Button("Actualizar", e -> actualizarTercero());      
-        btnActualizar.addClassName("btn-actualizar");
+    }
+    
+    private void configurarGrid() {
+    	grid.addColumn(Tercero::getId).setHeader("ID");
+        grid.addColumn(Tercero::getNombre).setHeader("Nombre");
+        grid.addColumn(Tercero::getCuitl).setHeader("CUIT/L");
+        grid.addColumn(Tercero::getSitiva).setHeader("IVA");
+        grid.addColumn(Tercero::getDireccion).setHeader("Dirección");
+        grid.addColumn(Tercero::getLocalidad).setHeader("Localidad");
+        grid.addColumn(Tercero::getProvincia).setHeader("Provincia");
+        grid.addColumn(Tercero::getTelefonos).setHeader("Teléfonos");
+        grid.addColumn(Tercero::getSaldoApertura).setHeader("Saldo");
+        grid.addColumn(Tercero::getTipoSaldo).setHeader("Tipo Saldo");
         
-        Button btnEliminar = new Button("Eliminar", e -> eliminarTercero());
-        btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
-        
-        Button btnLimpiarFormulario = new Button("Limpiar Formulario", e -> limpiarFormulario());
-        btnLimpiarFormulario.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
-        btnLimpiarFormulario.getStyle().set("margin-left", "30px");
-
-        HorizontalLayout acciones = new HorizontalLayout(btnAgregar, btnActualizar, btnEliminar, btnLimpiarFormulario);
-
-        add(acciones);
-    }
-
-    // ================= CRUD =================
-
-    private void agregarTercero() {
-
-        if (!validar()) return;
-
-        Tercero nuevoTercero = new Tercero();
-        mapearTercero(nuevoTercero);
-
-        if (terceroRepository.existsByCuitl(nuevoTercero.getCuitl())) {
-            showNotificacion("Ya existe un tercero con ese CUIT", NotificationVariant.LUMO_ERROR);
-            return;
-        }
-
-        terceroRepository.save(nuevoTercero);
-
-        showNotificacion("Tercero agregado", NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();
         actualizarGrid(null);
+
+        grid.asSingleSelect().addValueChangeListener(e -> {
+            terceroActual = e.getValue();
+            if (terceroActual != null) cargarFormulario(terceroActual);
+        });
+
+        add(grid);
     }
+    
+    private void configurarBuscador() {
+    	tfBuscar.setPlaceholder("Buscar Tercero por nombre...");
+        tfBuscar.setClearButtonVisible(true);
 
-    private void actualizarTercero() {
+        tfBuscar.setWidth("33%");
 
-        if (terceroActual.getId() == null) {
-            showNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
-            return;
-        }
+        tfBuscar.addValueChangeListener(e -> actualizarGrid(e.getValue()));
 
-        if (!validar()) return;
-        
-        mapearTercero(terceroActual);
+        HorizontalLayout buscadorLayout = new HorizontalLayout(tfBuscar);
+        buscadorLayout.setWidthFull();
+        buscadorLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        buscadorLayout.setAlignItems(FlexComponent.Alignment.START);
 
-        terceroRepository.save(terceroActual);
-
-        showNotificacion("Tercero actualizado", NotificationVariant.LUMO_SUCCESS);
-
-        limpiarFormulario();
-        actualizarGrid(null);
+        add(buscadorLayout);
     }
-
-    private void eliminarTercero() {
-
-        if (terceroActual.getId() == null) {
-            showNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
-            return;
-        }
-
-        terceroRepository.delete(terceroActual);
-
-        showNotificacion("Tercero eliminado", NotificationVariant.LUMO_ERROR);
-        limpiarFormulario();
-        actualizarGrid(null);
-    }
-
-    // ================= HELPERS =================
-
+    
     
     private void mapearTercero(Tercero t) {
         t.setNombre(tfNombre.getValue());
@@ -283,14 +320,9 @@ public class TerceroView extends VerticalLayout {
     private void actualizarGrid(String filtro) {
 
         if (filtro == null || filtro.isBlank()) {
-            grid.setItems(
-                    terceroRepository.findAll(
-                            Sort.by("id").ascending()
-                    )
-            );
+            grid.setItems(terceroRepository.findAll(Sort.by("id").ascending()));
             return;
         }
-
         grid.setItems(terceroRepository.findByNombreContainingIgnoreCaseOrderByIdAsc(filtro));
     }
 
