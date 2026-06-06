@@ -16,6 +16,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -67,13 +68,19 @@ public class FacultadView extends VerticalLayout {
 
         tfBuscar.setPlaceholder("Buscar por nombre...");
         tfBuscar.setClearButtonVisible(true);
-        tfBuscar.setWidthFull();
 
-        tfBuscar.addValueChangeListener(
-                e -> actualizarGrid(e.getValue())
-        );
+        // ancho controlado
+        tfBuscar.setWidth("33%");
+        //tfBuscar.setMaxWidth("650px");
 
-        add(tfBuscar);
+        tfBuscar.addValueChangeListener(e -> actualizarGrid(e.getValue()));
+
+        HorizontalLayout buscadorLayout = new HorizontalLayout(tfBuscar);
+        buscadorLayout.setWidthFull();
+        buscadorLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        buscadorLayout.setAlignItems(FlexComponent.Alignment.START);
+
+        add(buscadorLayout);
 
         // ================= GRID =================
 
@@ -115,7 +122,7 @@ public class FacultadView extends VerticalLayout {
 
         form.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
-                new FormLayout.ResponsiveStep("800px", 2)
+                new FormLayout.ResponsiveStep("800px", 3)
         );
 
         add(form);
@@ -126,7 +133,7 @@ public class FacultadView extends VerticalLayout {
         btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_PRIMARY);
 
         Button btnActualizar = new Button("Actualizar", e -> actualizarFacultad());
-        btnActualizar.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_PRIMARY);
+        btnActualizar.addClassName("btn-actualizar");
 
         Button btnEliminar = new Button("Eliminar", e -> eliminarFacultad());
         btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
@@ -134,8 +141,7 @@ public class FacultadView extends VerticalLayout {
         Button btnLimpiarFormulario = new Button("Limpiar Formulario",e -> limpiarFormulario());
         btnLimpiarFormulario.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
 
-        btnLimpiarFormulario.getStyle()
-                			.set("margin-left", "30px");
+        btnLimpiarFormulario.getStyle().set("margin-left", "30px");
 
         HorizontalLayout acciones = new HorizontalLayout(btnAgregar, btnActualizar,btnEliminar,btnLimpiarFormulario);
 

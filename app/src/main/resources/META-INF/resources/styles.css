@@ -86,3 +86,12 @@ vaadin-side-nav-item vaadin-icon {
     box-shadow: var(--card-hover-shadow) !important;
 }
 
+
+.btn-actualizar {
+    background-color: #4FC3F7 !important;
+    color: white;
+}
+
+
+
+

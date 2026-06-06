@@ -1,6 +1,7 @@
 package com.example.base.ui;
 
 
+import com.example.repositories.FacturaRepository;
 import com.example.repositories.FacultadRepository;
 import com.example.repositories.TerceroRepository;
 import com.vaadin.flow.component.button.Button;
@@ -22,10 +23,7 @@ import com.vaadin.flow.router.Route;
 @Menu(order = 0, icon = "vaadin:home")
 public class InicioView extends VerticalLayout {
 
-    public InicioView(
-            FacultadRepository facultadRepository,
-            TerceroRepository terceroRepository
-    ) {
+    public InicioView(FacultadRepository facultadRepository, TerceroRepository terceroRepository, FacturaRepository facturaRepository) {
 
         setSizeFull();
         setPadding(true);
@@ -74,8 +72,8 @@ public class InicioView extends VerticalLayout {
 
         VerticalLayout cardFacturas = crearCard(
                 "Facturas",
-                "0",
-                VaadinIcon.FILE_TEXT,
+                String.valueOf(facturaRepository.count()),
+                VaadinIcon.INVOICE,
                 "facturas"
         );
 

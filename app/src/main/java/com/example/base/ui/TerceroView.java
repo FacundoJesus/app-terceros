@@ -26,6 +26,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 
 import jakarta.validation.Validator;
 
@@ -68,11 +69,19 @@ public class TerceroView extends VerticalLayout {
         // ================= BUSCADOR =================
         tfBuscar.setPlaceholder("Buscar por nombre...");
         tfBuscar.setClearButtonVisible(true);
-        tfBuscar.setWidthFull();
+
+        // ancho controlado
+        tfBuscar.setWidth("33%");
+        //tfBuscar.setMaxWidth("640px");
 
         tfBuscar.addValueChangeListener(e -> actualizarGrid(e.getValue()));
 
-        add(tfBuscar);
+        HorizontalLayout buscadorLayout = new HorizontalLayout(tfBuscar);
+        buscadorLayout.setWidthFull();
+        buscadorLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        buscadorLayout.setAlignItems(FlexComponent.Alignment.START);
+
+        add(buscadorLayout);
 
         // ================= GRID =================
         grid.addColumn(Tercero::getId).setHeader("ID");
@@ -122,9 +131,9 @@ public class TerceroView extends VerticalLayout {
         Button btnAgregar = new Button("Agregar", e -> agregarTercero());
         btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.PRIMARY);
 
-        Button btnActualizar = new Button("Actualizar", e -> actualizarTercero());
-        btnActualizar.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.PRIMARY);
-
+        Button btnActualizar = new Button("Actualizar", e -> actualizarTercero());      
+        btnActualizar.addClassName("btn-actualizar");
+        
         Button btnEliminar = new Button("Eliminar", e -> eliminarTercero());
         btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
         
