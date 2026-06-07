@@ -1,12 +1,12 @@
-package com.project.base.ui;
+package com.project.ui;
 
 import java.math.BigDecimal;
 
 import org.springframework.data.domain.Sort;
 
-import com.project.models.SituacionIVA;
 import com.project.models.Tercero;
-import com.project.models.TipoSaldo;
+import com.project.models.enums.SituacionIVA;
+import com.project.models.enums.TipoSaldo;
 import com.project.repositories.TerceroRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

@@ -1,4 +1,4 @@
 @NullMarked
-package com.project.base.ui;
+package com.project.ui;
 
 import org.jspecify.annotations.NullMarked;

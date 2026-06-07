@@ -1,4 +1,4 @@
-package com.project.base.ui;
+package com.project.ui;
 
 import java.util.Collections;
 
@@ -102,7 +102,7 @@ public class FacturaView extends VerticalLayout {
 
         facturaRepository.save(f);
 
-        actualizarGrid(tfBuscar.getValue());
+        actualizarGridFacturas(tfBuscar.getValue());
         showNotificacion("Factura agregada", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
     }
@@ -137,7 +137,7 @@ public class FacturaView extends VerticalLayout {
 
         facturaRepository.delete(facturaActual);
 
-        actualizarGrid(tfBuscar.getValue());
+        actualizarGridFacturas(tfBuscar.getValue());
         showNotificacion("Factura eliminada",NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
         
@@ -152,7 +152,7 @@ public class FacturaView extends VerticalLayout {
 
         tfBuscar.setWidth("33%");
 
-        tfBuscar.addValueChangeListener(e -> actualizarGrid(e.getValue()));
+        tfBuscar.addValueChangeListener(e -> actualizarGridFacturas(e.getValue()));
 
         HorizontalLayout buscadorLayout = new HorizontalLayout(tfBuscar);
         buscadorLayout.setWidthFull();
@@ -178,7 +178,7 @@ public class FacturaView extends VerticalLayout {
         gridFacturas.addColumn(Factura::getNumeroFactura).setHeader("Número");
         gridFacturas.addColumn(f -> f.getTercero().getNombre()).setHeader("Tercero");
 
-        actualizarGrid(null);
+        actualizarGridFacturas(null);
         
         gridFacturas.asSingleSelect().addValueChangeListener(e -> {
             facturaActual = e.getValue();
@@ -202,7 +202,7 @@ public class FacturaView extends VerticalLayout {
         add(gridItems);
     }
     
-    private void actualizarGrid(String filtroNombre) {
+    private void actualizarGridFacturas(String filtroNombre) {
         if (filtroNombre == null || filtroNombre.isBlank()) {
             gridFacturas.setItems(facturaRepository.findAllWithDetails());
         } else {

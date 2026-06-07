@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.project.models.enums.SituacionIVA;
+import com.project.models.enums.TipoSaldo;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -55,13 +58,10 @@ public class Tercero {
 
     @Column(name="saldo_apertura")
     private BigDecimal saldoApertura;
-
-    
+   
     @Enumerated(EnumType.STRING)
     @Column(name="tipo_saldo")
     private TipoSaldo tipoSaldo;
     
-    // ✔️ OPCIONAL PERO RECOMENDADO
-    @OneToMany(mappedBy = "tercero")
-    private List<Factura> facturas = new ArrayList<>();
+
 }

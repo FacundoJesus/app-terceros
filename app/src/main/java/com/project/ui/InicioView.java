@@ -1,8 +1,9 @@
-package com.project.base.ui;
+package com.project.ui;
 
 
 import com.project.repositories.FacturaRepository;
 import com.project.repositories.FacultadRepository;
+import com.project.repositories.PagoRepository;
 import com.project.repositories.TerceroRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -23,7 +24,8 @@ import com.vaadin.flow.router.Route;
 @Menu(order = 0, icon = "vaadin:home")
 public class InicioView extends VerticalLayout {
 
-    public InicioView(FacultadRepository facultadRepository, TerceroRepository terceroRepository, FacturaRepository facturaRepository) {
+    public InicioView(FacultadRepository facultadRepository, TerceroRepository terceroRepository,
+    				  FacturaRepository facturaRepository, PagoRepository pagoRepository) {
 
         setSizeFull();
         setPadding(true);
@@ -75,7 +77,7 @@ public class InicioView extends VerticalLayout {
 
         VerticalLayout cardPagos = crearCard(
                 "Pagos",
-                "0",
+                String.valueOf(pagoRepository.count()),
                 VaadinIcon.MONEY,
                 "pagos"
         );

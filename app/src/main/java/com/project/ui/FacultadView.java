@@ -1,4 +1,4 @@
-package com.project.base.ui;
+package com.project.ui;
 
 
 import org.springframework.data.domain.Sort;
