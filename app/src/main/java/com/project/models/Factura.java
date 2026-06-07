@@ -40,8 +40,8 @@ public class Factura {
 	@Column(name="fecha_factura")
 	private LocalDate fechaFactura;
 	
-	@Column(name="numero")
 	@NotNull(message="El número de la factura es obligatorio")
+	@Column(name="numero", nullable=false)
 	private Integer numeroFactura;
 
 	// PROVEEDOR-TERCERO

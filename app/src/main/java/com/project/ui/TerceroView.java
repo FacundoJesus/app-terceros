@@ -21,6 +21,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
@@ -50,7 +51,7 @@ public class TerceroView extends VerticalLayout {
     private TextField tfLocalidad = new TextField("Localidad");
     private TextField tfProvincia = new TextField("Provincia");
     private TextField tfTelefonos = new TextField("Teléfonos");
-    private IntegerField tfSaldo = new IntegerField("Saldo Apertura");
+    private BigDecimalField tfSaldo = new BigDecimalField("Saldo Apertura");
     private ComboBox <TipoSaldo> cbTipoSaldo = new ComboBox<>("Tipo Saldo");
 
     private TextField tfBuscar = new TextField();
@@ -99,7 +100,7 @@ public class TerceroView extends VerticalLayout {
         nuevoTercero.setLocalidad(tfLocalidad.getValue());
         nuevoTercero.setProvincia(tfProvincia.getValue());
         nuevoTercero.setTelefonos(tfTelefonos.getValue());
-        nuevoTercero.setSaldoApertura(tfSaldo.getValue() != null ? BigDecimal.valueOf(tfSaldo.getValue()): null);
+        nuevoTercero.setSaldoApertura(tfSaldo.getValue());
         nuevoTercero.setTipoSaldo(cbTipoSaldo.getValue());
     	
         if (!validarTercero(terceroActual)) return;
@@ -130,7 +131,7 @@ public class TerceroView extends VerticalLayout {
         terceroActual.setLocalidad(tfLocalidad.getValue());
         terceroActual.setProvincia(tfProvincia.getValue());
         terceroActual.setTelefonos(tfTelefonos.getValue());
-        terceroActual.setSaldoApertura(tfSaldo.getValue() != null ? BigDecimal.valueOf(tfSaldo.getValue()): null);
+        terceroActual.setSaldoApertura(tfSaldo.getValue()); 
         terceroActual.setTipoSaldo(cbTipoSaldo.getValue());
         
         if (!validarTercero(terceroActual)) return;
@@ -241,6 +242,7 @@ public class TerceroView extends VerticalLayout {
     
        
     private void cargarFormulario(Tercero t) {
+    	
         tfNombre.setValue(t.getNombre() != null ? t.getNombre() : "");
         tfCuitl.setValue(t.getCuitl() != null ? t.getCuitl() : "");
         cbSituacionIva.setValue(t.getSitiva());
@@ -248,7 +250,7 @@ public class TerceroView extends VerticalLayout {
         tfLocalidad.setValue(t.getLocalidad() != null ? t.getLocalidad() : "");
         tfProvincia.setValue(t.getProvincia() != null ? t.getProvincia() : "");
         tfTelefonos.setValue(t.getTelefonos() != null ? t.getTelefonos() : "");
-        tfSaldo.setValue(t.getSaldoApertura() != null ? t.getSaldoApertura().intValue() : null);
+        tfSaldo.setValue(t.getSaldoApertura() != null ? t.getSaldoApertura(): null);
         cbTipoSaldo.setValue(t.getTipoSaldo());
     }
 

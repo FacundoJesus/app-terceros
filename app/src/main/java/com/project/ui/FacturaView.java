@@ -79,7 +79,7 @@ public class FacturaView extends VerticalLayout {
         titulo2.getStyle().set("text-align", "center");
         add(titulo2);
         
-        configurarGridItems();
+        configurarGridFacturaItems();
         
         // ================= FORM CABECERA =================
         cargarFormulario();
@@ -103,14 +103,14 @@ public class FacturaView extends VerticalLayout {
         facturaRepository.save(f);
 
         actualizarGridFacturas(tfBuscar.getValue());
-        showNotificacion("Factura agregada", NotificationVariant.LUMO_SUCCESS);
+        mostrarNotificacion("Factura agregada", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
     }
     
     private void actualizarFactura() {
 
     	if (facturaActual == null || facturaActual.getId() == null) {
-    	    showNotificacion("Debes seleccionar una Factura", NotificationVariant.LUMO_WARNING);
+    	    mostrarNotificacion("Debes seleccionar una Factura", NotificationVariant.LUMO_WARNING);
     	    return;
     	}
 
@@ -123,7 +123,7 @@ public class FacturaView extends VerticalLayout {
         facturaRepository.save(facturaActual);
 
         
-        showNotificacion("Factura actualizada", NotificationVariant.LUMO_SUCCESS);
+        mostrarNotificacion("Factura actualizada", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
         
     }
@@ -131,14 +131,14 @@ public class FacturaView extends VerticalLayout {
     
     private void eliminarFactura() {
         if (facturaActual == null || facturaActual.getId() == null) {
-        	showNotificacion("Debes seleccionar una Factura",NotificationVariant.LUMO_WARNING);
+        	mostrarNotificacion("Debes seleccionar una Factura",NotificationVariant.LUMO_WARNING);
         	return;
         }
 
         facturaRepository.delete(facturaActual);
 
         actualizarGridFacturas(tfBuscar.getValue());
-        showNotificacion("Factura eliminada",NotificationVariant.LUMO_SUCCESS);
+        mostrarNotificacion("Factura eliminada",NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
         
     }  
@@ -191,7 +191,7 @@ public class FacturaView extends VerticalLayout {
         add(gridFacturas);
     } 
     
-    private void configurarGridItems() {
+    private void configurarGridFacturaItems() {
         gridItems.addColumn(FacturaItem::getDetalle).setHeader("Detalle");
         gridItems.addColumn(FacturaItem::getCantidad).setHeader("Cantidad");
         gridItems.addColumn(FacturaItem::getMonto).setHeader("Monto");
@@ -204,9 +204,9 @@ public class FacturaView extends VerticalLayout {
     
     private void actualizarGridFacturas(String filtroNombre) {
         if (filtroNombre == null || filtroNombre.isBlank()) {
-            gridFacturas.setItems(facturaRepository.findAllWithDetails());
+            gridFacturas.setItems(facturaRepository.buscarTodasConItems());
         } else {
-            gridFacturas.setItems(facturaRepository.findByTerceroName(filtroNombre));
+            gridFacturas.setItems(facturaRepository.buscarPorNombreTercero(filtroNombre));
         }
         facturaActual = null;
         gridFacturas.deselectAll();
@@ -214,12 +214,8 @@ public class FacturaView extends VerticalLayout {
     }
     
     private void cargarFactura(Factura f) {
-        dpFecha.setValue(f.getFechaFactura());
-        if (f.getNumeroFactura() != null) {
-            ifNumero.setValue(f.getNumeroFactura());
-        } else {
-            ifNumero.clear();
-        }
+        dpFecha.setValue(f.getFechaFactura());  
+        ifNumero.setValue(f.getNumeroFactura());
         cbTercero.setValue(f.getTercero());
     }
 
@@ -255,13 +251,12 @@ public class FacturaView extends VerticalLayout {
         dpFecha.clear();
         ifNumero.clear();
         cbTercero.clear();
-        
-        
-        gridItems.setItems(Collections.emptyList());
+
         gridFacturas.deselectAll();
+        gridItems.setItems(Collections.emptyList());
     }
     
-    private void showNotificacion(String msg, NotificationVariant variant) {
+    private void mostrarNotificacion(String msg, NotificationVariant variant) {
 
         Icon icon;
 
@@ -299,7 +294,7 @@ public class FacturaView extends VerticalLayout {
             String mensaje = errores.stream()
                     .map(e -> "<li>" + e.getMessage() + "</li>")
                     .collect(java.util.stream.Collectors.joining());
-            showNotificacion("<b>Errores:</b><ul>" + mensaje + "</ul>",NotificationVariant.LUMO_ERROR);
+            mostrarNotificacion("<b>Errores:</b><ul>" + mensaje + "</ul>",NotificationVariant.LUMO_ERROR);
             return false;
         }
         return true;

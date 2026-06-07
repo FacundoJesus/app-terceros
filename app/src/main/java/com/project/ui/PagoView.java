@@ -2,6 +2,7 @@ package com.project.ui;
 
 import java.util.Collections;
 
+
 import com.project.models.Pago;
 import com.project.models.PagoDetalle;
 import com.project.models.Tercero;
@@ -13,8 +14,12 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -85,6 +90,9 @@ public class PagoView extends VerticalLayout {
         configurarBotones();
 		
 	}
+
+    
+    // ================= CRUD =================
 	
 
 	// ================= HELPERS =================
@@ -92,7 +100,7 @@ public class PagoView extends VerticalLayout {
 		tfBuscar.setPlaceholder("Buscar Pago por nombre...");
         tfBuscar.setClearButtonVisible(true);
 
-        tfBuscar.setWidth("33%");
+        tfBuscar.setWidth("44%");
 
         tfBuscar.addValueChangeListener(e -> actualizarGridPagos(e.getValue()));
 
@@ -102,6 +110,20 @@ public class PagoView extends VerticalLayout {
         buscadorLayout.setAlignItems(FlexComponent.Alignment.START);
 
         add(buscadorLayout);
+	}
+
+    
+    // ================= CRUD =================
+	private void agregarPago() {
+		
+	}
+	
+	private void actualizarPago() {
+		
+	}
+	
+	private void eliminarPago() {
+		
 	}
 	
 	private void configurarGridPagos() {
@@ -155,7 +177,6 @@ public class PagoView extends VerticalLayout {
 		HorizontalLayout formulario = new HorizontalLayout(dpFecha,bdfMontoPago,cbModoPago,cbTercero );
 		
 		add(formulario);
-		
 	}
 	
 	private void configurarBotones() {
@@ -168,7 +189,7 @@ public class PagoView extends VerticalLayout {
 		Button btnEliminar= new Button("Eliminar" /*,e -> eliminarPago()*/);
 		btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
 	
-		Button btnLimpiarForm = new Button("Limpiar Formulario" /*,e -> limpiarFormulario()*/);
+		Button btnLimpiarForm = new Button("Limpiar Formulario" ,e -> limpiarFormulario());
 		btnLimpiarForm.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
 		btnLimpiarForm.getStyle().set("margin-left", "30px");
 		
@@ -193,28 +214,61 @@ public class PagoView extends VerticalLayout {
 	}
 	
 	private void limpiarFormulario() {
+		pagoActual = new Pago();
 		
+		dpFecha.clear();
+		bdfMontoPago.clear();
+		cbModoPago.clear();
+		cbTercero.clear();
+		
+		gridPagos.deselectAll();
+		gridPagoDetalles.setItems(Collections.emptyList());	
 	}
 	
 	private void mostrarNotificacion(String mensaje, NotificationVariant variant) {
-		
-	}
+		Icon icon;
 
+        if (variant == NotificationVariant.LUMO_SUCCESS) {
+            icon = VaadinIcon.CHECK_CIRCLE.create();
+            icon.setColor("green");
+        } else if (variant == NotificationVariant.LUMO_ERROR) {
+            icon = VaadinIcon.CLOSE_CIRCLE.create();
+            icon.setColor("red");
+        } else {
+            icon = VaadinIcon.WARNING.create();
+            icon.setColor("orange");
+        } 
+
+        Div texto = new Div();
+        texto.getElement().setProperty("innerHTML", mensaje);
+
+        HorizontalLayout layout = new HorizontalLayout(icon, texto);
+        layout.setAlignItems(Alignment.CENTER);
+
+        Notification n = new Notification(layout);
+        n.addThemeVariants(variant);
+        n.setPosition(Notification.Position.MIDDLE);
+        n.setDuration(5000);
+
+        n.open();
+	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+    private boolean validarPago(Pago validarPago) {
+    	
+        var errores = validator.validate(validarPago);
+        
+        Boolean estado=true;
+        if (!errores.isEmpty()) {
+            String mensaje = errores.stream()
+				                    .map(e -> "<li>" + e.getMessage() + "</li>")
+				                    .collect(java.util.stream.Collectors.joining());   
+            mostrarNotificacion("<b>Errores:</b><ul>" + mensaje + "</ul>", NotificationVariant.LUMO_ERROR);  
+            estado = false;
+        }
+        
+        return estado;
+    }
+
+
 	
 }

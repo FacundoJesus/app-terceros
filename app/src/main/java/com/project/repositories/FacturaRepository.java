@@ -21,7 +21,7 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
 			LEFT JOIN FETCH f.items
 			ORDER BY f.id
 			""")
-	List<Factura> findAllWithDetails();
+	List<Factura> buscarTodasConItems();
 	
 	@Query("""
 		    SELECT f FROM Factura f
@@ -29,5 +29,5 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
 		    LEFT JOIN FETCH f.items
 		    WHERE LOWER(t.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))
 		""")
-	List<Factura> findByTerceroName(@Param("nombre") String nombre);
+	List<Factura> buscarPorNombreTercero(@Param("nombre") String nombre);
 }
