@@ -41,9 +41,11 @@ public class PagoView extends VerticalLayout {
 	private final TerceroRepository terceroRepository;
 	private final Validator validator;
 	
+	// ================= GRIDS =================
 	private Grid<Pago> gridPagos = new Grid<>(Pago.class,false);
 	private Grid<PagoDetalle> gridPagoDetalles = new Grid<>(PagoDetalle.class,false);
 	
+	// ================= PAGO SELECCIONADO =================
 	private Pago pagoActual = new Pago();
 	
 	// ================= FORM =================
@@ -93,7 +95,58 @@ public class PagoView extends VerticalLayout {
 
     
     // ================= CRUD =================
+	private void agregarPago() {
+		
+		Pago nuevoPago = new Pago();
+		
+		nuevoPago.setFechaPago(dpFecha.getValue());
+		nuevoPago.setMontoPago(bdfMontoPago.getValue());
+		nuevoPago.setModoPago(cbModoPago.getValue());
+		nuevoPago.setTercero(cbTercero.getValue());
+		
+		if(!validarPago(nuevoPago)) return;
+		
+		pagoRepository.save(nuevoPago);
+		
+		actualizarGridPagos(tfBuscar.getValue());
+        mostrarNotificacion("Pago agregado", NotificationVariant.LUMO_SUCCESS);
+        limpiarFormulario();	
+	}
 	
+	private void actualizarPago() {
+		
+		if(pagoActual == null || pagoActual.getId() == null) {
+			mostrarNotificacion("Debes seleccionar un Pago", NotificationVariant.LUMO_WARNING);
+			return;
+		}
+		
+		pagoActual.setFechaPago(dpFecha.getValue());
+		pagoActual.setMontoPago(bdfMontoPago.getValue());
+		pagoActual.setModoPago(cbModoPago.getValue());
+		pagoActual.setTercero(cbTercero.getValue());
+		
+		if(!validarPago(pagoActual)) return;
+		
+		pagoRepository.save(pagoActual);
+		
+		actualizarGridPagos(tfBuscar.getValue());
+        mostrarNotificacion("Pago actualizado", NotificationVariant.LUMO_SUCCESS);
+        limpiarFormulario();
+	}
+	
+	private void eliminarPago() {
+		
+		if(pagoActual == null || pagoActual.getId() == null) {
+			mostrarNotificacion("Debes seleccionar un Pago", NotificationVariant.LUMO_WARNING);
+			return;
+		}
+		
+		pagoRepository.delete(pagoActual);
+		
+		actualizarGridPagos(tfBuscar.getValue());
+        mostrarNotificacion("Pago eliminado", NotificationVariant.LUMO_SUCCESS);
+        limpiarFormulario();
+	}
 
 	// ================= HELPERS =================
 	private void configurarBuscador() {	
@@ -112,20 +165,6 @@ public class PagoView extends VerticalLayout {
         add(buscadorLayout);
 	}
 
-    
-    // ================= CRUD =================
-	private void agregarPago() {
-		
-	}
-	
-	private void actualizarPago() {
-		
-	}
-	
-	private void eliminarPago() {
-		
-	}
-	
 	private void configurarGridPagos() {
 		gridPagos.addColumn(Pago::getId).setHeader("ID");
 		gridPagos.addColumn(Pago::getFechaPago).setHeader("Fecha Pago");
@@ -180,18 +219,18 @@ public class PagoView extends VerticalLayout {
 	}
 	
 	private void configurarBotones() {
-		Button btnAgregar = new Button("Agregar" /*,e -> agregarPago()*/);
+		Button btnAgregar = new Button("Agregar", e -> agregarPago());
 		btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.PRIMARY);
 		
-		Button btnActualizar = new Button("Actualizar" /*,e -> actualizarPago()*/);
+		Button btnActualizar = new Button("Actualizar", e -> actualizarPago());
 		btnActualizar.addClassName("btn-actualizar");
 		
-		Button btnEliminar= new Button("Eliminar" /*,e -> eliminarPago()*/);
+		Button btnEliminar= new Button("Eliminar", e -> eliminarPago());
 		btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
 	
-		Button btnLimpiarForm = new Button("Limpiar Formulario" ,e -> limpiarFormulario());
+		Button btnLimpiarForm = new Button("Limpiar Formulario", e -> limpiarFormulario());
 		btnLimpiarForm.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
-		btnLimpiarForm.getStyle().set("margin-left", "30px");
+		btnLimpiarForm.getStyle().set("margin-left","30px");
 		
         HorizontalLayout acciones = new HorizontalLayout(btnAgregar, btnActualizar, btnEliminar, btnLimpiarForm);
 

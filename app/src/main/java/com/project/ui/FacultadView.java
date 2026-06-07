@@ -80,8 +80,6 @@ public class FacultadView extends VerticalLayout {
 
     }
     
-    
-    
     // ================= CRUD =================
     private void agregarFacultad() {
     	
@@ -105,7 +103,7 @@ public class FacultadView extends VerticalLayout {
         facultadRepository.save(nuevaFacultad);
         
         actualizarGrid(tfBuscar.getValue());
-        showNotificacion("Facultad agregada correctamente",NotificationVariant.LUMO_SUCCESS);
+        showNotificacion("Facultad agregada",NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();    
     }
     
@@ -130,7 +128,7 @@ public class FacultadView extends VerticalLayout {
         facultadRepository.save(facultadActual);
 
         actualizarGrid(tfBuscar.getValue());
-        showNotificacion("Facultad actualizada correctamente", NotificationVariant.LUMO_SUCCESS);
+        showNotificacion("Facultad actualizada", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
     }
 
@@ -144,7 +142,7 @@ public class FacultadView extends VerticalLayout {
         facultadRepository.delete(facultadActual);
         
         actualizarGrid(tfBuscar.getValue());
-        showNotificacion("Facultad eliminada correctamente", NotificationVariant.LUMO_SUCCESS);
+        showNotificacion("Facultad eliminada", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
     }
     

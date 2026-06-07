@@ -23,12 +23,14 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+
 @Getter
 @Setter
-@ToString
+@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name="pagos")
@@ -37,25 +39,25 @@ public class Pago {
 	@Id
 	@EqualsAndHashCode.Include
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id_pagos")
+	@Column(name= "id_pagos")
 	private Long id;
 	
-	@NotNull(message="La fecha del pago es obligatoria")
+	@NotNull(message= "La fecha del pago es obligatoria")
 	@Column(name="fecha_pago", nullable = false)
 	private LocalDate fechaPago;
 	
-	@NotNull(message="El monto del pago es obligatorio")
+	@NotNull(message= "El monto del pago es obligatorio")
 	@Column(name="monto_pago", nullable = false, scale = 2, precision = 12)
 	private BigDecimal montoPago;
 	
-	@NotNull(message = "El modo de pago es obligatorio")
+	@NotNull(message = "El modo del pago es obligatorio")
 	@Enumerated(EnumType.STRING)
 	@Column(name="modo_pago", nullable = false)
 	private ModoPago modoPago;
 	
 	// RELACION CON PROVEEDOR-TERCERO
+	@NotNull(message = "Debes seleccionar un Tercero")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@ToString.Exclude
 	@JoinColumn(
 	        name = "id_tercero",
 	        nullable = false

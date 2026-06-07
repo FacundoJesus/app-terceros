@@ -92,15 +92,15 @@ public class FacturaView extends VerticalLayout {
     // ================= CRUD =================
     private void agregarFactura() {
 
-        Factura f = new Factura();
+        Factura nuevaFactura = new Factura();
 
-        f.setNumeroFactura(ifNumero.getValue());
-        f.setFechaFactura(dpFecha.getValue());
-        f.setTercero(cbTercero.getValue());
+        nuevaFactura.setNumeroFactura(ifNumero.getValue());
+        nuevaFactura.setFechaFactura(dpFecha.getValue());
+        nuevaFactura.setTercero(cbTercero.getValue());
 
-        if (!validarFactura(f)) return;
-
-        facturaRepository.save(f);
+        if (!validarFactura(nuevaFactura)) return;
+        
+        facturaRepository.save(nuevaFactura);
 
         actualizarGridFacturas(tfBuscar.getValue());
         mostrarNotificacion("Factura agregada", NotificationVariant.LUMO_SUCCESS);

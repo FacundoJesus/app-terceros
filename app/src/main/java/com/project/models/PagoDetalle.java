@@ -20,7 +20,6 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "pagos_detalle")
@@ -47,7 +46,8 @@ public class PagoDetalle {
     private Boolean pagoRealizado = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_pagos", nullable = false)
-    @ToString.Exclude
+    @JoinColumn(
+    		name = "id_pagos",
+    		nullable = false)
     private Pago pago;
 }

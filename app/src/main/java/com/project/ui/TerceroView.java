@@ -51,7 +51,7 @@ public class TerceroView extends VerticalLayout {
     private TextField tfLocalidad = new TextField("Localidad");
     private TextField tfProvincia = new TextField("Provincia");
     private TextField tfTelefonos = new TextField("Teléfonos");
-    private BigDecimalField tfSaldo = new BigDecimalField("Saldo Apertura");
+    private BigDecimalField tfSaldoApertura = new BigDecimalField("Saldo Apertura");
     private ComboBox <TipoSaldo> cbTipoSaldo = new ComboBox<>("Tipo Saldo");
 
     private TextField tfBuscar = new TextField();
@@ -100,10 +100,10 @@ public class TerceroView extends VerticalLayout {
         nuevoTercero.setLocalidad(tfLocalidad.getValue());
         nuevoTercero.setProvincia(tfProvincia.getValue());
         nuevoTercero.setTelefonos(tfTelefonos.getValue());
-        nuevoTercero.setSaldoApertura(tfSaldo.getValue());
+        nuevoTercero.setSaldoApertura(tfSaldoApertura.getValue());
         nuevoTercero.setTipoSaldo(cbTipoSaldo.getValue());
     	
-        if (!validarTercero(terceroActual)) return;
+        if (!validarTercero(nuevoTercero)) return;
 
         if (terceroRepository.existsByCuitl(nuevoTercero.getCuitl())) {
             showNotificacion("Ya existe un tercero con ese CUIT", NotificationVariant.LUMO_ERROR);
@@ -131,7 +131,7 @@ public class TerceroView extends VerticalLayout {
         terceroActual.setLocalidad(tfLocalidad.getValue());
         terceroActual.setProvincia(tfProvincia.getValue());
         terceroActual.setTelefonos(tfTelefonos.getValue());
-        terceroActual.setSaldoApertura(tfSaldo.getValue()); 
+        terceroActual.setSaldoApertura(tfSaldoApertura.getValue()); 
         terceroActual.setTipoSaldo(cbTipoSaldo.getValue());
         
         if (!validarTercero(terceroActual)) return;
@@ -190,7 +190,7 @@ public class TerceroView extends VerticalLayout {
                 tfLocalidad,
                 tfProvincia,
                 tfTelefonos,
-                tfSaldo,
+                tfSaldoApertura,
                 cbTipoSaldo
         );
 
@@ -250,7 +250,7 @@ public class TerceroView extends VerticalLayout {
         tfLocalidad.setValue(t.getLocalidad() != null ? t.getLocalidad() : "");
         tfProvincia.setValue(t.getProvincia() != null ? t.getProvincia() : "");
         tfTelefonos.setValue(t.getTelefonos() != null ? t.getTelefonos() : "");
-        tfSaldo.setValue(t.getSaldoApertura() != null ? t.getSaldoApertura(): null);
+        tfSaldoApertura.setValue(t.getSaldoApertura() != null ? t.getSaldoApertura(): null);
         cbTipoSaldo.setValue(t.getTipoSaldo());
     }
 
@@ -281,7 +281,7 @@ public class TerceroView extends VerticalLayout {
         tfLocalidad.clear();
         tfProvincia.clear();
         tfTelefonos.clear();
-        tfSaldo.clear();
+        tfSaldoApertura.clear();
         cbTipoSaldo.clear();
         
         grid.deselectAll();

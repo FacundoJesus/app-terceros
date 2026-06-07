@@ -18,13 +18,14 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 
 @Getter
 @Setter
-@ToString
+@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name="facturas")
@@ -37,15 +38,14 @@ public class Factura {
 	private Long id;
 	
 	@NotNull(message="La fecha de la factura es obligatoria")
-	@Column(name="fecha_factura")
+	@Column(name="fecha_factura", nullable = false)
 	private LocalDate fechaFactura;
 	
 	@NotNull(message="El número de la factura es obligatorio")
-	@Column(name="numero", nullable=false)
+	@Column(name="numero")
 	private Integer numeroFactura;
 
 	// PROVEEDOR-TERCERO
-	@ToString.Exclude
 	@NotNull(message = "Debe seleccionar un tercero")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
