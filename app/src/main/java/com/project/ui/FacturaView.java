@@ -237,10 +237,10 @@ public class FacturaView extends VerticalLayout {
         Button btnEliminar = new Button("Eliminar", e -> eliminarFactura());
         btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
 
-        Button btnLimpiar = new Button("Limpiar Formulario", e -> limpiarFormulario());
-        btnLimpiar.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
-
-        HorizontalLayout acciones = new HorizontalLayout(btnAgregar,btnActualizar,btnEliminar,btnLimpiar);
+        Button btnLimpiarForm = new Button("Limpiar Formulario", e -> limpiarFormulario());
+        btnLimpiarForm.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        btnLimpiarForm.getStyle().set("margin-left", "30px");
+        HorizontalLayout acciones = new HorizontalLayout(btnAgregar,btnActualizar,btnEliminar,btnLimpiarForm);
 
         acciones.setWidthFull();
         acciones.setJustifyContentMode(FlexComponent.JustifyContentMode.START);

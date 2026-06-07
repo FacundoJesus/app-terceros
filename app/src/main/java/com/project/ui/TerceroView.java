@@ -168,11 +168,11 @@ public class TerceroView extends VerticalLayout {
         Button btnEliminar = new Button("Eliminar", e -> eliminarTercero());
         btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
         
-        Button btnLimpiarFormulario = new Button("Limpiar Formulario", e -> limpiarFormulario());
-        btnLimpiarFormulario.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
-        btnLimpiarFormulario.getStyle().set("margin-left", "30px");
+        Button btnLimpiarForm = new Button("Limpiar Formulario", e -> limpiarFormulario());
+        btnLimpiarForm.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        btnLimpiarForm.getStyle().set("margin-left", "30px");
 
-        HorizontalLayout acciones = new HorizontalLayout(btnAgregar, btnActualizar, btnEliminar, btnLimpiarFormulario);
+        HorizontalLayout acciones = new HorizontalLayout(btnAgregar, btnActualizar, btnEliminar, btnLimpiarForm);
 
         add(acciones);
     }

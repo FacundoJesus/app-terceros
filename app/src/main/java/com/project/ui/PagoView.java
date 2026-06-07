@@ -1,15 +1,21 @@
 package com.project.ui;
 
+import java.util.Collections;
+
 import com.project.models.Pago;
 import com.project.models.PagoDetalle;
 import com.project.models.Tercero;
 import com.project.models.enums.ModoPago;
 import com.project.repositories.PagoRepository;
+import com.project.repositories.TerceroRepository;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -27,6 +33,7 @@ import jakarta.validation.Validator;
 public class PagoView extends VerticalLayout {
 	
 	private final PagoRepository pagoRepository;
+	private final TerceroRepository terceroRepository;
 	private final Validator validator;
 	
 	private Grid<Pago> gridPagos = new Grid<>(Pago.class,false);
@@ -37,14 +44,15 @@ public class PagoView extends VerticalLayout {
 	// ================= FORM =================
 	private DatePicker dpFecha = new DatePicker("Fecha");
 	private BigDecimalField bdfMontoPago = new BigDecimalField("Monto Pago");
-	private ComboBox<ModoPago> cbModoPago = new ComboBox<>();
-	private ComboBox<Tercero> cbTercero = new ComboBox<>();
+	private ComboBox<ModoPago> cbModoPago = new ComboBox<>("Modo Pago");
+	private ComboBox<Tercero> cbTercero = new ComboBox<>("Tercero");
 	
 	private TextField tfBuscar = new TextField();
 	
 	
-	public PagoView(PagoRepository pagoRepository, Validator validator) {
+	public PagoView(PagoRepository pagoRepository, TerceroRepository terceroRepository,Validator validator) {
 		
+		this.terceroRepository = terceroRepository;
 		this.pagoRepository = pagoRepository;
 		this.validator = validator;
 		
@@ -79,14 +87,14 @@ public class PagoView extends VerticalLayout {
 	}
 	
 
-	// HELPERS
+	// ================= HELPERS =================
 	private void configurarBuscador() {	
 		tfBuscar.setPlaceholder("Buscar Pago por nombre...");
         tfBuscar.setClearButtonVisible(true);
 
         tfBuscar.setWidth("33%");
 
-        //tfBuscar.addValueChangeListener(e -> actualizarGridPagos(e.getValue()));
+        tfBuscar.addValueChangeListener(e -> actualizarGridPagos(e.getValue()));
 
         HorizontalLayout buscadorLayout = new HorizontalLayout(tfBuscar);
         buscadorLayout.setWidthFull();
@@ -103,15 +111,26 @@ public class PagoView extends VerticalLayout {
 		gridPagos.addColumn(Pago::getModoPago).setHeader("Modo Pago");
 		gridPagos.addColumn(pago -> pago.getTercero().getNombre()).setHeader("Tercero");
 		
-		//actualizarGridPagos(null);
+		actualizarGridPagos(null);
 		gridPagos.asSingleSelect().addValueChangeListener(evento -> {
 			pagoActual = evento.getValue();
 			if(pagoActual != null) {
-				//cargarPago(pagoActual);
-				//cargarPagoDetalles(pagoActual);
+				cargarPago(pagoActual);
+				cargarPagoDetalle(pagoActual);
 			}
 		});		
 		add(gridPagos);
+	}
+	
+	private void cargarPago(Pago p) {
+		dpFecha.setValue(p.getFechaPago());
+		bdfMontoPago.setValue(p.getMontoPago());
+		cbModoPago.setValue(p.getModoPago());
+		cbTercero.setValue(p.getTercero());
+	}
+	
+	private void cargarPagoDetalle(Pago p) {
+		gridPagoDetalles.setItems(p.getPagosDetalles());
 	}
 	
 	private void configurarGridPagoDetalles() {
@@ -126,14 +145,58 @@ public class PagoView extends VerticalLayout {
         add(gridPagoDetalles);	
 	}
 	
-	private void configurarBotones() {
-		
-		
-	}
-
 
 	private void cargarFormulario() {
+		cbModoPago.setItems(ModoPago.values());
 		
+		cbTercero.setItems(terceroRepository.findAll());
+		cbTercero.setItemLabelGenerator(Tercero::getNombre);
+		
+		HorizontalLayout formulario = new HorizontalLayout(dpFecha,bdfMontoPago,cbModoPago,cbTercero );
+		
+		add(formulario);
+		
+	}
+	
+	private void configurarBotones() {
+		Button btnAgregar = new Button("Agregar" /*,e -> agregarPago()*/);
+		btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.PRIMARY);
+		
+		Button btnActualizar = new Button("Actualizar" /*,e -> actualizarPago()*/);
+		btnActualizar.addClassName("btn-actualizar");
+		
+		Button btnEliminar= new Button("Eliminar" /*,e -> eliminarPago()*/);
+		btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
+	
+		Button btnLimpiarForm = new Button("Limpiar Formulario" /*,e -> limpiarFormulario()*/);
+		btnLimpiarForm.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+		btnLimpiarForm.getStyle().set("margin-left", "30px");
+		
+        HorizontalLayout acciones = new HorizontalLayout(btnAgregar, btnActualizar, btnEliminar, btnLimpiarForm);
+
+        acciones.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        acciones.setAlignItems(FlexComponent.Alignment.CENTER);
+        add(acciones);
+	}
+	
+	private void actualizarGridPagos(String filtroNombre) {
+
+	    if (filtroNombre == null || filtroNombre.isBlank()) {
+	        gridPagos.setItems(pagoRepository.buscarTodosConDetalles());
+	    } else {
+	        gridPagos.setItems(pagoRepository.buscarPorNombreTercero(filtroNombre));
+	    }
+
+	    pagoActual = null;
+	    gridPagos.deselectAll();
+	    gridPagoDetalles.setItems(Collections.emptyList());
+	}
+	
+	private void limpiarFormulario() {
+		
+	}
+	
+	private void mostrarNotificacion(String mensaje, NotificationVariant variant) {
 		
 	}
 

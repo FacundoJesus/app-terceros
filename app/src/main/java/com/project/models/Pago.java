@@ -45,7 +45,7 @@ public class Pago {
 	private LocalDate fechaPago;
 	
 	@NotNull(message="El monto del pago es obligatorio")
-	@Column(name="monto_pago", nullable = false, scale = 2)
+	@Column(name="monto_pago", nullable = false, scale = 2, precision = 12)
 	private BigDecimal montoPago;
 	
 	@NotNull(message = "El modo de pago es obligatorio")
