@@ -28,10 +28,10 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Validator;
 
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"USER","ADMIN"})
 @Route(value = "facultades", layout = MainLayout.class)
 @PageTitle("Facultades")
-@Menu(order = 1, icon = "vaadin:building")
+@Menu(order = 1, icon = "vaadin:academy-cap")
 public class FacultadView extends VerticalLayout {
 	
     private final FacultadRepository facultadRepository;

@@ -31,7 +31,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Validator;
 
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"USER","ADMIN"})
 @Route(value = "terceros", layout = MainLayout.class)
 @PageTitle("Terceros")
 @Menu(order = 2, icon = "vaadin:users")

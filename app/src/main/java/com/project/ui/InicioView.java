@@ -22,7 +22,7 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 
-@PermitAll
+@RolesAllowed({"USER","ADMIN"})
 @Route(value = "/", layout = MainLayout.class)
 @PageTitle("Inicio")
 @Menu(order = 0, icon = "vaadin:home")
@@ -61,7 +61,7 @@ public class InicioView extends VerticalLayout {
         VerticalLayout cardFacultades = crearCard(
                 "Facultades",
                 String.valueOf(facultadRepository.count()),
-                VaadinIcon.BUILDING,
+                VaadinIcon.ACADEMY_CAP,
                 "facultades"
         );
 

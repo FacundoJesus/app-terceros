@@ -33,7 +33,7 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Validator;
 
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"USER","ADMIN"})
 @Route(value = "pagos", layout = MainLayout.class)
 @PageTitle("Pagos")
 @Menu(order = 4, icon = "vaadin:money")

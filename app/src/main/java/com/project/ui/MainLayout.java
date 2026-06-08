@@ -118,11 +118,48 @@ public final class MainLayout extends AppLayout {
     }
 
     private Component createApplicationDrawer() {
-        var scroller = new Scroller(createSideNav());
-        scroller.addThemeVariants(ScrollerVariant.OVERFLOW_INDICATORS);
-        return scroller;
-    }
 
+        boolean esAdmin = authenticationContext
+                .getAuthenticatedUser(UserDetails.class)
+                .map(user -> user.getAuthorities()
+                        .stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")))
+                .orElse(false);
+
+        SideNav navPrincipal = new SideNav();
+        SideNav navAdmin = new SideNav();
+
+        MenuConfiguration.getMenuEntries().forEach(entry -> {
+
+            if ("Usuarios".equals(entry.title())) {
+                navAdmin.addItem(createSideNavItem(entry));
+            } else {
+                navPrincipal.addItem(createSideNavItem(entry));
+            }
+        });
+
+        VerticalLayout menu = new VerticalLayout();
+        menu.add(navPrincipal);
+
+        // 👇 SOLO ADMIN VE TODO ESTO
+        if (esAdmin && !navAdmin.getItems().isEmpty()) {
+
+            Span adminLabel = new Span("ADMINISTRACIÓN");
+            adminLabel.getStyle()
+                    .set("font-size", "var(--lumo-font-size-xs)")
+                    .set("font-weight", "600")
+                    .set("color", "var(--lumo-secondary-text-color)")
+                    .set("margin-top", "1rem")
+                    .set("margin-left", "0.5rem");
+
+            menu.add(adminLabel, navAdmin);
+        }
+
+        menu.setSpacing(false);
+        menu.setPadding(false);
+
+        return new Scroller(menu);
+    }
     private Component createApplicationFooter() {
 
         Button btnLogout = new Button("Cerrar sesión");
