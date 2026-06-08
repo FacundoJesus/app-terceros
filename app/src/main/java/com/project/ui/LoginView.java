@@ -37,7 +37,7 @@ public class LoginView extends Main implements BeforeEnterObserver {
         subtitulo.getStyle()
                 .set("color", "var(--lumo-secondary-text-color)");
         
-        Avatar avatar = new Avatar("AT");
+        Avatar avatar = new Avatar("A T");
         avatar.addThemeVariants(
             AvatarVariant.AURA_FILLED,
             AvatarVariant.LARGE
@@ -55,7 +55,7 @@ public class LoginView extends Main implements BeforeEnterObserver {
         card.setSpacing(true);
 
         card.getStyle()
-        .set("border", "1px solid gray")
+        .set("border", "1px solid rgb(128, 128, 255)")
         .set("border-radius", "12px")
         .set("padding", "20px");
 
