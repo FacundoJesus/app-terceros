@@ -1,6 +1,6 @@
 package com.project.ui;
 
-import java.math.BigDecimal;
+
 
 import org.springframework.data.domain.Sort;
 
@@ -22,15 +22,16 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
-import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Validator;
 
+@RolesAllowed({"ADMIN"})
 @Route(value = "terceros", layout = MainLayout.class)
 @PageTitle("Terceros")
 @Menu(order = 2, icon = "vaadin:users")

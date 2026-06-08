@@ -28,9 +28,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Validator;
 
-
+@RolesAllowed({"ADMIN"})
 @Route(value = "facturas", layout = MainLayout.class)
 @PageTitle("Facturas")
 @Menu(order = 3, icon = "vaadin:invoice")

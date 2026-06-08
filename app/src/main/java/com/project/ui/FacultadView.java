@@ -25,8 +25,10 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Validator;
 
+@RolesAllowed({"ADMIN"})
 @Route(value = "facultades", layout = MainLayout.class)
 @PageTitle("Facultades")
 @Menu(order = 1, icon = "vaadin:building")

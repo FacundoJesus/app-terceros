@@ -16,7 +16,6 @@ html {
 /* LIGHT MODE (controlado por Vaadin theme attribute) */
 html[theme="light"] {
     color-scheme: light;
-
     --card-hover-shadow: 0 8px 30px rgba(255,140,0,.35);
 }
 
@@ -74,7 +73,7 @@ vaadin-side-nav-item vaadin-icon {
     border-radius: 15px;
 
     background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid gray;
 
     cursor: pointer;
 

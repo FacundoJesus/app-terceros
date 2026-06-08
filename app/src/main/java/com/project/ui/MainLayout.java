@@ -1,5 +1,7 @@
 package com.project.ui;
 
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
@@ -17,17 +19,32 @@ import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.server.menu.MenuEntry;
+import com.vaadin.flow.spring.security.AuthenticationContext;
+
+import jakarta.annotation.security.PermitAll;
+
 
 @Layout
+@PermitAll
 public final class MainLayout extends AppLayout {
 
-    MainLayout() {
+    private final AuthenticationContext authenticationContext;
+
+    public MainLayout(AuthenticationContext authenticationContext) {
+
+        this.authenticationContext = authenticationContext;
+
         setPrimarySection(Section.DRAWER);
-        addToDrawer(createApplicationHeader(), createApplicationDrawer(), createApplicationFooter());
+        addToDrawer(
+            createApplicationHeader(),
+            createApplicationDrawer(),
+            createApplicationFooter()
+        );
     }
 
     private Component createApplicationHeader() {
 
+    	// LOGO
         var appLogo = new Avatar("Aplicación Terceros");
         appLogo.addClassName("app-logo");
         appLogo.addThemeVariants(
@@ -35,9 +52,31 @@ public final class MainLayout extends AppLayout {
                 AvatarVariant.XSMALL
         );
 
-        var appName = new Span("App Terceros");
+        // NOMBRE APLICACION
+        Span appName = new Span("App Terceros");
         appName.addClassName("app-name");
 
+        // USUARIO LOGUEADO
+        Span usuarioActual = new Span();
+        authenticationContext
+                .getAuthenticatedUser(UserDetails.class)
+                .ifPresent(user ->
+                        usuarioActual.setText("Usuario: " + user.getUsername())
+                );
+        usuarioActual.getStyle()
+                .set("font-size", "var(--lumo-font-size-s)")
+                .set("color", "var(--lumo-secondary-text-color)");
+
+        // NOMBRE + USUARIO
+        VerticalLayout appInfo = new VerticalLayout(
+                appName,
+                usuarioActual
+        );
+
+        appInfo.setSpacing(false);
+        appInfo.setPadding(false);
+
+        // BOTON TEMA OSCURO-CLARO
         Button btnTema = new Button(VaadinIcon.MOON.create());
 
         btnTema.addClickListener(e -> {
@@ -62,17 +101,16 @@ public final class MainLayout extends AppLayout {
             });
         });
 
-        
         HorizontalLayout header = new HorizontalLayout();
 
         header.setWidthFull();
         header.setAlignItems(FlexComponent.Alignment.CENTER);
         header.setPadding(true);
 
-        header.add(appLogo, appName);
+        header.add(appLogo, appInfo);
 
-        // Empuja el botón a la derecha
-        header.expand(appName);
+        // Empuja el botón hacia la derecha
+        header.expand(appInfo);
 
         header.add(btnTema);
 
@@ -86,9 +124,17 @@ public final class MainLayout extends AppLayout {
     }
 
     private Component createApplicationFooter() {
-        var footer = new VerticalLayout(new Span("Citera, Facundo Jesús"));
+
+        Button btnLogout = new Button("Cerrar sesión");
+
+        btnLogout.addClickListener(event ->
+            authenticationContext.logout()
+        );
+
+        VerticalLayout footer = new VerticalLayout(btnLogout);
+
         footer.setAlignItems(FlexComponent.Alignment.CENTER);
-        footer.addClassName("app-footer");
+
         return footer;
     }
 
@@ -113,4 +159,5 @@ public final class MainLayout extends AppLayout {
             return new SideNavItem(menuEntry.title(), menuEntry.path());
         }
     }
+    
 }

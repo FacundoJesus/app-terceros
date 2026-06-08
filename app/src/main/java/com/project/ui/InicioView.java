@@ -19,6 +19,10 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+
+@PermitAll
 @Route(value = "/", layout = MainLayout.class)
 @PageTitle("Inicio")
 @Menu(order = 0, icon = "vaadin:home")
@@ -37,7 +41,7 @@ public class InicioView extends VerticalLayout {
 
         // ================= TITULO =================
 
-        H1 titulo = new H1("Dashboard");
+        H1 titulo = new H1("Panel");
 
         Span subtitulo = new Span("Bienvenido al Sistema de Gestión");
 
