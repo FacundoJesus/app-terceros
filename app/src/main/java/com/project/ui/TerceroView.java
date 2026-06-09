@@ -125,7 +125,7 @@ public class TerceroView extends VerticalLayout {
 
     private void actualizarTercero() {
 
-        if (terceroActual.getId() == null) {
+        if (terceroActual == null || terceroActual.getId() == null) {
             showNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
             return;
         }
@@ -142,7 +142,7 @@ public class TerceroView extends VerticalLayout {
 
     private void eliminarTercero() {
 
-        if (terceroActual.getId() == null) {
+        if (terceroActual == null || terceroActual.getId() == null) {
             showNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
             return;
         }

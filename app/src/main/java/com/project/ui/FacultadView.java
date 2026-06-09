@@ -97,7 +97,7 @@ public class FacultadView extends VerticalLayout {
     
     private void actualizarFacultad() {
 
-        if (facultadActual.getId() == null) {
+        if (facultadActual == null || facultadActual.getId() == null) {
             mostrarNotificacion("Seleccione una facultad",NotificationVariant.LUMO_WARNING);
             return;
         }
@@ -113,7 +113,7 @@ public class FacultadView extends VerticalLayout {
     
     private void eliminarFacultad() {
 
-        if (facultadActual.getId() == null) {
+        if (facultadActual == null || facultadActual.getId() == null) {
             mostrarNotificacion("Seleccione una facultad", NotificationVariant.LUMO_WARNING);
             return;
         }

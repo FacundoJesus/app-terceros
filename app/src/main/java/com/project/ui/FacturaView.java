@@ -110,13 +110,12 @@ public class FacturaView extends VerticalLayout {
         
         actualizarGridFacturas(tfBuscar.getValue());
         mostrarNotificacion("Factura agregada", NotificationVariant.LUMO_SUCCESS);
-        
         limpiarFormulario();
     }
     
     private void actualizarFactura() {
 
-    	if (facturaActual.getId() == null) {
+    	if (facturaActual == null || facturaActual.getId() == null) {
     	    mostrarNotificacion("Debes seleccionar una Factura", NotificationVariant.LUMO_WARNING);
     	    return;
     	}
@@ -133,7 +132,7 @@ public class FacturaView extends VerticalLayout {
     
     private void eliminarFactura() {
     	
-        if (facturaActual.getId() == null) {
+        if (facturaActual == null || facturaActual.getId() == null) {
         	mostrarNotificacion("Debes seleccionar una Factura",NotificationVariant.LUMO_WARNING);
         	return;
         }
@@ -227,7 +226,7 @@ public class FacturaView extends VerticalLayout {
         Button btnActualizar = new Button("Actualizar", VaadinIcon.EDIT.create(), e -> actualizarFactura());
         btnActualizar.addClassName("btn-actualizar");
 
-        Button btnEliminar = new Button("Eliminar",VaadinIcon.TRASH.create(), e -> eliminarFactura());
+        Button btnEliminar = new Button("Eliminar", VaadinIcon.TRASH.create(), e -> eliminarFactura());
         btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
 
         Button btnLimpiarForm = new Button("Limpiar Formulario", VaadinIcon.ERASER.create(), e -> limpiarFormulario());
@@ -262,12 +261,9 @@ public class FacturaView extends VerticalLayout {
         } else if (variant == NotificationVariant.LUMO_ERROR) {
             icon = VaadinIcon.CLOSE_CIRCLE.create();
             icon.setColor("red");
-        } else if (variant == NotificationVariant.LUMO_WARNING) {
-            icon = VaadinIcon.WARNING.create();
-            icon.setColor("orange");
         } else {
-            icon = VaadinIcon.INFO_CIRCLE.create();
-            icon.setColor("blue");
+            icon = VaadinIcon.WARNING.create();
+            icon.setColor("yellow");
         }
 
         Div texto = new Div();

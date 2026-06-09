@@ -2,7 +2,7 @@ package com.project.ui;
 
 import java.util.Collections;
 
-
+import com.project.models.Factura;
 import com.project.models.Pago;
 import com.project.models.PagoDetalle;
 import com.project.models.Tercero;
@@ -26,6 +26,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -41,16 +42,15 @@ public class PagoView extends VerticalLayout {
 	
 	private final PagoRepository pagoRepository;
 	private final TerceroRepository terceroRepository;
-	private final Validator validator;
+
+	private final BeanValidationBinder<Pago> binderPago = new BeanValidationBinder<>(Pago.class);
 	
-	// ================= GRIDS =================
 	private Grid<Pago> gridPagos = new Grid<>(Pago.class,false);
 	private Grid<PagoDetalle> gridPagoDetalles = new Grid<>(PagoDetalle.class,false);
 	
-	// ================= PAGO SELECCIONADO =================
+
 	private Pago pagoActual = new Pago();
-	
-	// ================= FORM =================
+
 	private DatePicker dpFecha = new DatePicker("Fecha");
 	private BigDecimalField bdfMontoPago = new BigDecimalField("Monto Pago");
 	private ComboBox<ModoPago> cbModoPago = new ComboBox<>("Modo Pago");
@@ -59,13 +59,13 @@ public class PagoView extends VerticalLayout {
 	private TextField tfBuscar = new TextField();
 	
 	
-	public PagoView(PagoRepository pagoRepository, TerceroRepository terceroRepository,Validator validator) {
+	public PagoView(PagoRepository pagoRepository, TerceroRepository terceroRepository) {
 		
 		this.terceroRepository = terceroRepository;
 		this.pagoRepository = pagoRepository;
-		this.validator = validator;
-		
 		setSizeFull();
+		
+		configurarBinder();
 
 		// ================= HEADER =================
 		H1 titulo = new H1("Gestión de Pagos");
@@ -92,23 +92,25 @@ public class PagoView extends VerticalLayout {
 
         // ================= BOTONES =================
         configurarBotones();
-		
+        
+        limpiarFormulario();
 	}
 
     
-    // ================= CRUD =================
+    private void configurarBinder() {
+    	binderPago.forField(dpFecha).bind("fechaPago");
+    	binderPago.forField(bdfMontoPago).bind("montoPago");
+    	binderPago.forField(cbModoPago).bind("modoPago");
+    	binderPago.forField(cbTercero).bind("tercero");
+	}
+
+
+	// ================= CRUD =================
 	private void agregarPago() {
 		
-		Pago nuevoPago = new Pago();
-		
-		nuevoPago.setFechaPago(dpFecha.getValue());
-		nuevoPago.setMontoPago(bdfMontoPago.getValue());
-		nuevoPago.setModoPago(cbModoPago.getValue());
-		nuevoPago.setTercero(cbTercero.getValue());
-		
-		if(!validarPago(nuevoPago)) return;
-		
-		pagoRepository.save(nuevoPago);
+		if(!binderPago.validate().isOk()) return;
+
+		pagoRepository.save(pagoActual);
 		
 		actualizarGridPagos(tfBuscar.getValue());
         mostrarNotificacion("Pago agregado", NotificationVariant.LUMO_SUCCESS);
@@ -122,12 +124,7 @@ public class PagoView extends VerticalLayout {
 			return;
 		}
 		
-		pagoActual.setFechaPago(dpFecha.getValue());
-		pagoActual.setMontoPago(bdfMontoPago.getValue());
-		pagoActual.setModoPago(cbModoPago.getValue());
-		pagoActual.setTercero(cbTercero.getValue());
-		
-		if(!validarPago(pagoActual)) return;
+		if(!binderPago.validate().isOk()) return;
 		
 		pagoRepository.save(pagoActual);
 		
@@ -178,19 +175,13 @@ public class PagoView extends VerticalLayout {
 		gridPagos.asSingleSelect().addValueChangeListener(evento -> {
 			pagoActual = evento.getValue();
 			if(pagoActual != null) {
-				cargarPago(pagoActual);
+				binderPago.setBean(pagoActual);
 				cargarPagoDetalle(pagoActual);
 			}
 		});		
 		add(gridPagos);
 	}
 	
-	private void cargarPago(Pago p) {
-		dpFecha.setValue(p.getFechaPago());
-		bdfMontoPago.setValue(p.getMontoPago());
-		cbModoPago.setValue(p.getModoPago());
-		cbTercero.setValue(p.getTercero());
-	}
 	
 	private void cargarPagoDetalle(Pago p) {
 		gridPagoDetalles.setItems(p.getPagosDetalles());
@@ -221,16 +212,16 @@ public class PagoView extends VerticalLayout {
 	}
 	
 	private void configurarBotones() {
-		Button btnAgregar = new Button("Agregar", e -> agregarPago());
+		Button btnAgregar = new Button("Agregar", VaadinIcon.PLUS.create(), e -> agregarPago());
 		btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.PRIMARY);
 		
-		Button btnActualizar = new Button("Actualizar", e -> actualizarPago());
+		Button btnActualizar = new Button("Actualizar", VaadinIcon.EDIT.create(), e -> actualizarPago());
 		btnActualizar.addClassName("btn-actualizar");
 		
-		Button btnEliminar= new Button("Eliminar", e -> eliminarPago());
+		Button btnEliminar= new Button("Eliminar", VaadinIcon.TRASH.create(), e -> eliminarPago());
 		btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
 	
-		Button btnLimpiarForm = new Button("Limpiar Formulario", e -> limpiarFormulario());
+		Button btnLimpiarForm = new Button("Limpiar Formulario",  VaadinIcon.ERASER.create(), e -> limpiarFormulario());
 		btnLimpiarForm.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
 		btnLimpiarForm.getStyle().set("margin-left","30px");
 		
@@ -257,10 +248,7 @@ public class PagoView extends VerticalLayout {
 	private void limpiarFormulario() {
 		pagoActual = new Pago();
 		
-		dpFecha.clear();
-		bdfMontoPago.clear();
-		cbModoPago.clear();
-		cbTercero.clear();
+		binderPago.setBean(pagoActual);
 		
 		gridPagos.deselectAll();
 		gridPagoDetalles.setItems(Collections.emptyList());	
@@ -294,22 +282,5 @@ public class PagoView extends VerticalLayout {
         n.open();
 	}
 	
-    private boolean validarPago(Pago validarPago) {
-    	
-        var errores = validator.validate(validarPago);
-        
-        Boolean estado=true;
-        if (!errores.isEmpty()) {
-            String mensaje = errores.stream()
-				                    .map(e -> "<li>" + e.getMessage() + "</li>")
-				                    .collect(java.util.stream.Collectors.joining());   
-            mostrarNotificacion("<b>Errores:</b><ul>" + mensaje + "</ul>", NotificationVariant.LUMO_ERROR);  
-            estado = false;
-        }
-        
-        return estado;
-    }
-
-
 	
 }
