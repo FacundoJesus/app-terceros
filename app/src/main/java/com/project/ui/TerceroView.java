@@ -23,13 +23,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.validation.Validator;
+
 
 @RolesAllowed({"USER","ADMIN"})
 @Route(value = "terceros", layout = MainLayout.class)
@@ -38,10 +39,10 @@ import jakarta.validation.Validator;
 public class TerceroView extends VerticalLayout {
 
     private final TerceroRepository terceroRepository;
-    private final Validator validator;
     
+    private final BeanValidationBinder<Tercero> binder = new BeanValidationBinder<>(Tercero.class);
     private Grid<Tercero> grid = new Grid(Tercero.class, false);
-
+    
     private Tercero terceroActual = new Tercero();
 
     // ================= FORM =================
@@ -52,18 +53,18 @@ public class TerceroView extends VerticalLayout {
     private TextField tfLocalidad = new TextField("Localidad");
     private TextField tfProvincia = new TextField("Provincia");
     private TextField tfTelefonos = new TextField("Teléfonos");
-    private BigDecimalField tfSaldoApertura = new BigDecimalField("Saldo Apertura");
+    private BigDecimalField bdfSaldoApertura = new BigDecimalField("Saldo Apertura");
     private ComboBox <TipoSaldo> cbTipoSaldo = new ComboBox<>("Tipo Saldo");
 
     private TextField tfBuscar = new TextField();
 
-    public TerceroView(TerceroRepository repository, Validator validator) {
+    public TerceroView(TerceroRepository repository) {
     	
     	setSizeFull();
     	
         this.terceroRepository = repository;
-        this.validator = validator;
 
+        configurarBinder();
         // ================= HEADER =================
         H1 titulo = new H1("Gestión de Terceros");
         titulo.setWidthFull();
@@ -85,63 +86,58 @@ public class TerceroView extends VerticalLayout {
         // ================= BOTONES =================
         
         configurarBotones();  
+        
+        limpiarFormulario();
     }
 
     
     // ================= CRUD =================
 
-    private void agregarTercero() {
+    private void configurarBinder() {
+		binder.forField(tfNombre).bind("nombre");
+		binder.forField(tfCuitl).bind("cuitl");
+		binder.forField(cbSituacionIva).bind("sitiva");
+		binder.forField(tfDireccion).bind("direccion");
+		binder.forField(tfLocalidad).bind("localidad");
+		binder.forField(tfProvincia).bind("provincia");
+		binder.forField(tfTelefonos).bind("telefonos");
+		binder.forField(bdfSaldoApertura).bind("saldoApertura");
+		binder.forField(cbTipoSaldo).bind("tipoSaldo");
+	}
 
-    	Tercero nuevoTercero = new Tercero();
-    	
-        nuevoTercero.setNombre(tfNombre.getValue());
-        nuevoTercero.setCuitl(tfCuitl.getValue());
-        nuevoTercero.setSitiva(cbSituacionIva.getValue());
-        nuevoTercero.setDireccion(tfDireccion.getValue());
-        nuevoTercero.setLocalidad(tfLocalidad.getValue());
-        nuevoTercero.setProvincia(tfProvincia.getValue());
-        nuevoTercero.setTelefonos(tfTelefonos.getValue());
-        nuevoTercero.setSaldoApertura(tfSaldoApertura.getValue());
-        nuevoTercero.setTipoSaldo(cbTipoSaldo.getValue());
-    	
-        if (!validarTercero(nuevoTercero)) return;
 
-        if (terceroRepository.existsByCuitl(nuevoTercero.getCuitl())) {
+	private void agregarTercero() {
+  	
+    	if(!binder.validate().isOk()) return;
+    	
+        if (terceroRepository.existsByCuitl(terceroActual.getCuitl())) {
             showNotificacion("Ya existe un tercero con ese CUIT", NotificationVariant.LUMO_ERROR);
             return;
         }
 
-        terceroRepository.save(nuevoTercero);
-
+        terceroRepository.save(terceroActual);
+        
         actualizarGrid(tfBuscar.getValue());
         showNotificacion("Tercero agregado", NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();         
-    }
+        limpiarFormulario(); 
+    		
+	}
 
     private void actualizarTercero() {
 
-        if (terceroActual == null || terceroActual.getId() == null) {
+        if (terceroActual.getId() == null) {
             showNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
             return;
         }
-      
-        terceroActual.setNombre(tfNombre.getValue());
-        terceroActual.setCuitl(tfCuitl.getValue());
-        terceroActual.setSitiva(cbSituacionIva.getValue());
-        terceroActual.setDireccion(tfDireccion.getValue());
-        terceroActual.setLocalidad(tfLocalidad.getValue());
-        terceroActual.setProvincia(tfProvincia.getValue());
-        terceroActual.setTelefonos(tfTelefonos.getValue());
-        terceroActual.setSaldoApertura(tfSaldoApertura.getValue()); 
-        terceroActual.setTipoSaldo(cbTipoSaldo.getValue());
         
-        if (!validarTercero(terceroActual)) return;
-        
+        if(!binder.validate().isOk()) return;
+    	
         terceroRepository.save(terceroActual);
 
         actualizarGrid(tfBuscar.getValue());
         showNotificacion("Tercero actualizado", NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();   
+        limpiarFormulario();     	
+  
     }
 
     private void eliminarTercero() {
@@ -161,16 +157,16 @@ public class TerceroView extends VerticalLayout {
     // ================= HELPERS =================
     
     private void configurarBotones() {
-    	Button btnAgregar = new Button("Agregar", e -> agregarTercero());
+    	Button btnAgregar = new Button("Agregar", VaadinIcon.PLUS.create(), e -> agregarTercero());
         btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.PRIMARY);
 
-        Button btnActualizar = new Button("Actualizar", e -> actualizarTercero());      
+        Button btnActualizar = new Button("Actualizar", VaadinIcon.EDIT.create(), e -> actualizarTercero());      
         btnActualizar.addClassName("btn-actualizar");
         
-        Button btnEliminar = new Button("Eliminar", e -> eliminarTercero());
+        Button btnEliminar = new Button("Eliminar", VaadinIcon.TRASH.create(), e -> eliminarTercero());
         btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
         
-        Button btnLimpiarForm = new Button("Limpiar Formulario", e -> limpiarFormulario());
+        Button btnLimpiarForm = new Button("Limpiar Formulario", VaadinIcon.ERASER.create(), e -> limpiarFormulario());
         btnLimpiarForm.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         btnLimpiarForm.getStyle().set("margin-left", "30px");
 
@@ -191,7 +187,7 @@ public class TerceroView extends VerticalLayout {
                 tfLocalidad,
                 tfProvincia,
                 tfTelefonos,
-                tfSaldoApertura,
+                bdfSaldoApertura,
                 cbTipoSaldo
         );
 
@@ -219,7 +215,7 @@ public class TerceroView extends VerticalLayout {
 
         grid.asSingleSelect().addValueChangeListener(e -> {
             terceroActual = e.getValue();
-            if (terceroActual != null) cargarFormulario(terceroActual);
+            if (terceroActual != null) binder.setBean(terceroActual);
         });
 
         add(grid);
@@ -228,7 +224,6 @@ public class TerceroView extends VerticalLayout {
     private void configurarBuscador() {
     	tfBuscar.setPlaceholder("Buscar Tercero por nombre...");
         tfBuscar.setClearButtonVisible(true);
-
         tfBuscar.setWidth("33%");
 
         tfBuscar.addValueChangeListener(e -> actualizarGrid(e.getValue()));
@@ -241,56 +236,15 @@ public class TerceroView extends VerticalLayout {
         add(buscadorLayout);
     }
     
-       
-    private void cargarFormulario(Tercero t) {
-    	
-        tfNombre.setValue(t.getNombre() != null ? t.getNombre() : "");
-        tfCuitl.setValue(t.getCuitl() != null ? t.getCuitl() : "");
-        cbSituacionIva.setValue(t.getSitiva());
-        tfDireccion.setValue(t.getDireccion() != null ? t.getDireccion() : "");
-        tfLocalidad.setValue(t.getLocalidad() != null ? t.getLocalidad() : "");
-        tfProvincia.setValue(t.getProvincia() != null ? t.getProvincia() : "");
-        tfTelefonos.setValue(t.getTelefonos() != null ? t.getTelefonos() : "");
-        tfSaldoApertura.setValue(t.getSaldoApertura() != null ? t.getSaldoApertura(): null);
-        cbTipoSaldo.setValue(t.getTipoSaldo());
-    }
 
-    
-    private boolean validarTercero(Tercero t) {
-    	
-    	var errores = validator.validate(t);
-
-        if (!errores.isEmpty()) {
-        	String mensaje = errores.stream()
-        	        .map(e -> "<li>" + e.getMessage() + "</li>")
-        	        .collect(java.util.stream.Collectors.joining());
-
-        	showNotificacion("<b>Se encontraron errores:</b><ul>" + mensaje + "</ul>", NotificationVariant.LUMO_ERROR);
-            return false;
-        }
-        return true;
-    }
-
-    
     private void limpiarFormulario() {
-        terceroActual = new Tercero();
-
-        tfNombre.clear();
-        tfCuitl.clear();
-        cbSituacionIva.clear();
-        tfDireccion.clear();
-        tfLocalidad.clear();
-        tfProvincia.clear();
-        tfTelefonos.clear();
-        tfSaldoApertura.clear();
-        cbTipoSaldo.clear();
-        
+        terceroActual = new Tercero();  
+        binder.setBean(terceroActual);
         grid.deselectAll();
     }
 
     
     private void actualizarGrid(String filtroNombre) {
-
         if (filtroNombre == null || filtroNombre.isBlank()) {
             grid.setItems(terceroRepository.findAll(Sort.by("id").ascending()));
             return;
@@ -309,12 +263,9 @@ public class TerceroView extends VerticalLayout {
         } else if (variant == NotificationVariant.LUMO_ERROR) {
             icon = VaadinIcon.CLOSE_CIRCLE.create();
             icon.setColor("red");
-        } else if (variant == NotificationVariant.LUMO_WARNING) {
-            icon = VaadinIcon.WARNING.create();
-            icon.setColor("orange");
         } else {
-            icon = VaadinIcon.INFO_CIRCLE.create();
-            icon.setColor("blue");
+            icon = VaadinIcon.WARNING.create();
+            icon.setColor("yellow");
         }
 
         Div texto = new Div();

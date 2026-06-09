@@ -39,7 +39,7 @@ public class FacultadView extends VerticalLayout {
     private final BeanValidationBinder<Facultad> binder = new BeanValidationBinder<>(Facultad.class);
     private Grid<Facultad> grid = new Grid<>(Facultad.class, false);
 
-    private Facultad facultadActual;
+    private Facultad facultadActual = new Facultad();
 
     private TextField tfNombre = new TextField("Nombre");
     private TextField tfDireccion = new TextField("Dirección");
@@ -68,7 +68,7 @@ public class FacultadView extends VerticalLayout {
         
         configurarGrid();
         
-        cargarFormulario();
+        configurarFormulario();
         
         configurarBotones();
 
@@ -81,55 +81,39 @@ public class FacultadView extends VerticalLayout {
     
     private void agregarFacultad() {
     	
-    	Facultad nuevaFacultad = new Facultad();
-  
     	if (!binder.validate().isOk()) return;
-    	
-        try {
-            binder.writeBean(nuevaFacultad);
-            
-            if (facultadRepository.existsByCuit(nuevaFacultad.getCuit())) {
-                mostrarNotificacion("Ya existe una Facultad con ese CUIT", NotificationVariant.LUMO_ERROR);
-                return;
-            }
-            
-            facultadRepository.save(nuevaFacultad);
-
-            actualizarGrid(tfBuscar.getValue());
-
-            mostrarNotificacion("Facultad agregada", NotificationVariant.LUMO_SUCCESS);
-            limpiarFormulario();
-            
-        } catch (ValidationException e) {
-        	e.printStackTrace();
+    	           
+        if (facultadRepository.existsByCuit(facultadActual.getCuit())) {
+            mostrarNotificacion("Ya existe una Facultad con ese CUIT", NotificationVariant.LUMO_ERROR);
+            return;
         }
+        
+        facultadRepository.save(facultadActual);
+
+        actualizarGrid(tfBuscar.getValue());
+        mostrarNotificacion("Facultad agregada", NotificationVariant.LUMO_SUCCESS);
+        limpiarFormulario();
     }
     
     private void actualizarFacultad() {
 
-        if (facultadActual == null || facultadActual.getId() == null) {
+        if (facultadActual.getId() == null) {
             mostrarNotificacion("Seleccione una facultad",NotificationVariant.LUMO_WARNING);
             return;
         }
         
-        try {
-            binder.writeBean(facultadActual);
+        if (!binder.validate().isOk()) return;
             
-            facultadRepository.save(facultadActual);
-            
-            actualizarGrid(tfBuscar.getValue());
-            mostrarNotificacion("Facultad actualizada",NotificationVariant.LUMO_SUCCESS);
-            limpiarFormulario();
-
-        }catch (ValidationException e) {
-        	e.printStackTrace();
-        }
+        facultadRepository.save(facultadActual);
         
+        actualizarGrid(tfBuscar.getValue());
+        mostrarNotificacion("Facultad actualizada",NotificationVariant.LUMO_SUCCESS);
+        limpiarFormulario();  
     }
     
     private void eliminarFacultad() {
 
-        if (facultadActual == null || facultadActual.getId() == null) {
+        if (facultadActual.getId() == null) {
             mostrarNotificacion("Seleccione una facultad", NotificationVariant.LUMO_WARNING);
             return;
         }
@@ -190,7 +174,7 @@ public class FacultadView extends VerticalLayout {
         add(buscadorLayout);
     }
     
-    private void cargarFormulario() {
+    private void configurarFormulario() {
         FormLayout form = new FormLayout();
         form.add(
                 tfNombre,

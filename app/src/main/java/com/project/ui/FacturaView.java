@@ -23,13 +23,13 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.validation.Validator;
 
 @RolesAllowed({"USER","ADMIN"})
 @Route(value = "facturas", layout = MainLayout.class)
@@ -39,27 +39,29 @@ public class FacturaView extends VerticalLayout {
 
     private final FacturaRepository facturaRepository;
     private final TerceroRepository terceroRepository;
-    private final Validator validator;
 
+    private final BeanValidationBinder<Factura> binderFactura = new BeanValidationBinder<>(Factura.class);
+    
     private Grid<Factura> gridFacturas = new Grid<>(Factura.class, false);
     private Grid<FacturaItem> gridItems = new Grid<>(FacturaItem.class, false);
 
     private Factura facturaActual = new Factura();
 
-    // ================= FORM =================
     private DatePicker dpFecha = new DatePicker("Fecha");
     private IntegerField ifNumero = new IntegerField("Número");
     private ComboBox<Tercero> cbTercero = new ComboBox<>("Tercero");
 
     private TextField tfBuscar = new TextField();
     
-    public FacturaView(FacturaRepository facturaRepository, TerceroRepository terceroRepository, Validator validator) {
+    
+    public FacturaView(FacturaRepository facturaRepository, TerceroRepository terceroRepository) {
     	
     	setSizeFull();
         this.facturaRepository = facturaRepository;
         this.terceroRepository = terceroRepository;
-        this.validator = validator;
 
+        configurarBinderFactura();
+        
         // ================= HEADER =================
         H1 titulo = new H1("Gestión de Facturas");
         titulo.setWidthFull();
@@ -75,7 +77,7 @@ public class FacturaView extends VerticalLayout {
         configurarGridFacturas();
 
         // ================= GRID ITEMS =================
-        H3 titulo2 = new H3("Facturas Items");
+        H3 titulo2 = new H3("Items de la Factura");
         titulo2.setWidthFull();
         titulo2.getStyle().set("text-align", "center");
         add(titulo2);
@@ -87,51 +89,51 @@ public class FacturaView extends VerticalLayout {
 
         // ================= BOTONES =================
         configurarBotones();
-
+        
+        limpiarFormulario();
     }
 
-    // ================= CRUD =================
+    
+    
+    private void configurarBinderFactura() {
+    	binderFactura.forField(dpFecha).bind("fechaFactura");
+    	binderFactura.forField(ifNumero).bind("numeroFactura");
+    	binderFactura.forField(cbTercero).bind("tercero");
+	}
+
+	// ================= CRUD =================
     private void agregarFactura() {
 
-        Factura nuevaFactura = new Factura();
-
-        nuevaFactura.setNumeroFactura(ifNumero.getValue());
-        nuevaFactura.setFechaFactura(dpFecha.getValue());
-        nuevaFactura.setTercero(cbTercero.getValue());
-
-        if (!validarFactura(nuevaFactura)) return;
+    	if(!binderFactura.validate().isOk()) return;
+       
+        facturaRepository.save(facturaActual);
         
-        facturaRepository.save(nuevaFactura);
-
         actualizarGridFacturas(tfBuscar.getValue());
         mostrarNotificacion("Factura agregada", NotificationVariant.LUMO_SUCCESS);
+        
         limpiarFormulario();
     }
     
     private void actualizarFactura() {
 
-    	if (facturaActual == null || facturaActual.getId() == null) {
+    	if (facturaActual.getId() == null) {
     	    mostrarNotificacion("Debes seleccionar una Factura", NotificationVariant.LUMO_WARNING);
     	    return;
     	}
-
-        facturaActual.setNumeroFactura(ifNumero.getValue());
-        facturaActual.setFechaFactura(dpFecha.getValue());
-        facturaActual.setTercero(cbTercero.getValue());
-
-        if (!validarFactura(facturaActual)) return;
+    	
+    	if(!binderFactura.validate().isOk()) return;
 
         facturaRepository.save(facturaActual);
-
         
+        actualizarGridFacturas(tfBuscar.getValue());
         mostrarNotificacion("Factura actualizada", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
-        
     }
     
     
     private void eliminarFactura() {
-        if (facturaActual == null || facturaActual.getId() == null) {
+    	
+        if (facturaActual.getId() == null) {
         	mostrarNotificacion("Debes seleccionar una Factura",NotificationVariant.LUMO_WARNING);
         	return;
         }
@@ -140,8 +142,7 @@ public class FacturaView extends VerticalLayout {
 
         actualizarGridFacturas(tfBuscar.getValue());
         mostrarNotificacion("Factura eliminada",NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();
-        
+        limpiarFormulario();     
     }  
     
     
@@ -184,7 +185,7 @@ public class FacturaView extends VerticalLayout {
         gridFacturas.asSingleSelect().addValueChangeListener(e -> {
             facturaActual = e.getValue();
             if (facturaActual != null) {
-                cargarFactura(facturaActual);
+                binderFactura.setBean(facturaActual);
                 cargarItems(facturaActual);
             }
         });
@@ -214,27 +215,22 @@ public class FacturaView extends VerticalLayout {
         gridItems.setItems(Collections.emptyList());
     }
     
-    private void cargarFactura(Factura f) {
-        dpFecha.setValue(f.getFechaFactura());  
-        ifNumero.setValue(f.getNumeroFactura());
-        cbTercero.setValue(f.getTercero());
-    }
 
     private void cargarItems(Factura f) {
         gridItems.setItems(f.getItems());
     }
     
     private void configurarBotones() {
-        Button btnAgregar = new Button("Agregar", e -> agregarFactura());
+        Button btnAgregar = new Button("Agregar", VaadinIcon.PLUS.create(), e -> agregarFactura());
         btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.PRIMARY);
 
-        Button btnActualizar = new Button("Actualizar", e -> actualizarFactura());
+        Button btnActualizar = new Button("Actualizar", VaadinIcon.EDIT.create(), e -> actualizarFactura());
         btnActualizar.addClassName("btn-actualizar");
 
-        Button btnEliminar = new Button("Eliminar", e -> eliminarFactura());
+        Button btnEliminar = new Button("Eliminar",VaadinIcon.TRASH.create(), e -> eliminarFactura());
         btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
 
-        Button btnLimpiarForm = new Button("Limpiar Formulario", e -> limpiarFormulario());
+        Button btnLimpiarForm = new Button("Limpiar Formulario", VaadinIcon.ERASER.create(), e -> limpiarFormulario());
         btnLimpiarForm.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         btnLimpiarForm.getStyle().set("margin-left", "30px");
         HorizontalLayout acciones = new HorizontalLayout(btnAgregar,btnActualizar,btnEliminar,btnLimpiarForm);
@@ -247,12 +243,11 @@ public class FacturaView extends VerticalLayout {
     }
     
     private void limpiarFormulario() {
-        facturaActual = new Factura();
-
-        dpFecha.clear();
-        ifNumero.clear();
-        cbTercero.clear();
-
+    	
+    	facturaActual = new Factura();
+ 
+    	binderFactura.setBean(facturaActual);
+    	
         gridFacturas.deselectAll();
         gridItems.setItems(Collections.emptyList());
     }
@@ -287,21 +282,7 @@ public class FacturaView extends VerticalLayout {
         n.setDuration(5000);
 
         n.open();
-    }
-    
-    private boolean validarFactura(Factura f) {
-        var errores = validator.validate(f);
-        if (!errores.isEmpty()) {
-            String mensaje = errores.stream()
-                    .map(e -> "<li>" + e.getMessage() + "</li>")
-                    .collect(java.util.stream.Collectors.joining());
-            mostrarNotificacion("<b>Errores:</b><ul>" + mensaje + "</ul>",NotificationVariant.LUMO_ERROR);
-            return false;
-        }
-        return true;
-    }
-    
-     
+    } 
 }
     
     
