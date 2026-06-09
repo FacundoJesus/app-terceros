@@ -10,18 +10,13 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -32,7 +27,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 @Route(value = "facultades", layout = MainLayout.class)
 @PageTitle("Facultades")
 @Menu(order = 1, icon = "vaadin:academy-cap")
-public class FacultadView extends VerticalLayout {
+public class FacultadView extends BaseView {
 	
     private final FacultadRepository facultadRepository;
 
@@ -224,39 +219,6 @@ public class FacultadView extends VerticalLayout {
             return;
         }
         grid.setItems(facultadRepository.findByNombreContainingIgnoreCaseOrderByIdAsc(filtroNombre));
-    }
-
-    private void mostrarNotificacion(String msg, NotificationVariant variant) {
-
-        Icon icon;
-
-        if (variant == NotificationVariant.LUMO_SUCCESS) {
-            icon = VaadinIcon.CHECK_CIRCLE.create();
-            icon.setColor("green");
-        } else if (variant == NotificationVariant.LUMO_ERROR) {
-            icon = VaadinIcon.CLOSE_CIRCLE.create();
-            icon.setColor("red");
-        } else {
-        	//WARNING
-            icon = VaadinIcon.WARNING.create();
-            icon.setColor("yellow");
-        }
-
-        Div texto = new Div();
-        texto.getElement().setProperty("innerHTML", msg);
-
-        HorizontalLayout contenido = new HorizontalLayout(icon, texto);
-
-        contenido.setAlignItems(Alignment.CENTER);
-
-        Notification n = new Notification(contenido);
-
-        n.addThemeVariants(variant);
-        n.setDuration(5000);
-        n.setPosition(Notification.Position.MIDDLE);
-
-        n.open();
-    }
-    
+    } 
 	
 }

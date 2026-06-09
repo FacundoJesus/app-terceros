@@ -26,7 +26,7 @@ import jakarta.annotation.security.RolesAllowed;
 @Route(value = "/", layout = MainLayout.class)
 @PageTitle("Inicio")
 @Menu(order = 0, icon = "vaadin:home")
-public class InicioView extends VerticalLayout {
+public class InicioView extends BaseView {
 
     public InicioView(FacultadRepository facultadRepository, TerceroRepository terceroRepository,
     				  FacturaRepository facturaRepository, PagoRepository pagoRepository) {

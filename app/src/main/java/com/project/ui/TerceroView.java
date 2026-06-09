@@ -36,7 +36,7 @@ import jakarta.annotation.security.RolesAllowed;
 @Route(value = "terceros", layout = MainLayout.class)
 @PageTitle("Terceros")
 @Menu(order = 2, icon = "vaadin:users")
-public class TerceroView extends VerticalLayout {
+public class TerceroView extends BaseView {
 
     private final TerceroRepository terceroRepository;
     
@@ -111,14 +111,14 @@ public class TerceroView extends VerticalLayout {
     	if(!binder.validate().isOk()) return;
     	
         if (terceroRepository.existsByCuitl(terceroActual.getCuitl())) {
-            showNotificacion("Ya existe un tercero con ese CUIT", NotificationVariant.LUMO_ERROR);
+            mostrarNotificacion("Ya existe un tercero con ese CUIT", NotificationVariant.LUMO_ERROR);
             return;
         }
 
         terceroRepository.save(terceroActual);
         
         actualizarGrid(tfBuscar.getValue());
-        showNotificacion("Tercero agregado", NotificationVariant.LUMO_SUCCESS);
+        mostrarNotificacion("Tercero agregado", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario(); 
     		
 	}
@@ -126,7 +126,7 @@ public class TerceroView extends VerticalLayout {
     private void actualizarTercero() {
 
         if (terceroActual == null || terceroActual.getId() == null) {
-            showNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
+            mostrarNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
             return;
         }
         
@@ -135,7 +135,7 @@ public class TerceroView extends VerticalLayout {
         terceroRepository.save(terceroActual);
 
         actualizarGrid(tfBuscar.getValue());
-        showNotificacion("Tercero actualizado", NotificationVariant.LUMO_SUCCESS);
+        mostrarNotificacion("Tercero actualizado", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();     	
   
     }
@@ -143,14 +143,14 @@ public class TerceroView extends VerticalLayout {
     private void eliminarTercero() {
 
         if (terceroActual == null || terceroActual.getId() == null) {
-            showNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
+            mostrarNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
             return;
         }
 
         terceroRepository.delete(terceroActual);
 
         actualizarGrid(tfBuscar.getValue());
-        showNotificacion("Tercero eliminado", NotificationVariant.LUMO_SUCCESS);
+        mostrarNotificacion("Tercero eliminado", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();
     }
 
@@ -236,14 +236,12 @@ public class TerceroView extends VerticalLayout {
         add(buscadorLayout);
     }
     
-
     private void limpiarFormulario() {
         terceroActual = new Tercero();  
         binder.setBean(terceroActual);
         grid.deselectAll();
     }
-
-    
+ 
     private void actualizarGrid(String filtroNombre) {
         if (filtroNombre == null || filtroNombre.isBlank()) {
             grid.setItems(terceroRepository.findAll(Sort.by("id").ascending()));
@@ -252,33 +250,4 @@ public class TerceroView extends VerticalLayout {
         grid.setItems(terceroRepository.findByNombreContainingIgnoreCaseOrderByIdAsc(filtroNombre));
     }
 
-    
-    private void showNotificacion(String msg, NotificationVariant variant) {
-
-        Icon icon;
-
-        if (variant == NotificationVariant.LUMO_SUCCESS) {
-            icon = VaadinIcon.CHECK_CIRCLE.create();
-            icon.setColor("green");
-        } else if (variant == NotificationVariant.LUMO_ERROR) {
-            icon = VaadinIcon.CLOSE_CIRCLE.create();
-            icon.setColor("red");
-        } else {
-            icon = VaadinIcon.WARNING.create();
-            icon.setColor("yellow");
-        }
-
-        Div texto = new Div();
-        texto.getElement().setProperty("innerHTML", msg);
-
-        HorizontalLayout layout = new HorizontalLayout(icon, texto);
-        layout.setAlignItems(Alignment.CENTER);
-
-        Notification n = new Notification(layout);
-        n.addThemeVariants(variant);
-        n.setPosition(Notification.Position.MIDDLE);
-        n.setDuration(5000);
-
-        n.open();
-    }
 }

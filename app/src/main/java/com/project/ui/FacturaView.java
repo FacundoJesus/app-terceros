@@ -35,7 +35,7 @@ import jakarta.annotation.security.RolesAllowed;
 @Route(value = "facturas", layout = MainLayout.class)
 @PageTitle("Facturas")
 @Menu(order = 3, icon = "vaadin:invoice")
-public class FacturaView extends VerticalLayout {
+public class FacturaView extends BaseView {
 
     private final FacturaRepository facturaRepository;
     private final TerceroRepository terceroRepository;
@@ -251,34 +251,6 @@ public class FacturaView extends VerticalLayout {
         gridItems.setItems(Collections.emptyList());
     }
     
-    private void mostrarNotificacion(String msg, NotificationVariant variant) {
-
-        Icon icon;
-
-        if (variant == NotificationVariant.LUMO_SUCCESS) {
-            icon = VaadinIcon.CHECK_CIRCLE.create();
-            icon.setColor("green");
-        } else if (variant == NotificationVariant.LUMO_ERROR) {
-            icon = VaadinIcon.CLOSE_CIRCLE.create();
-            icon.setColor("red");
-        } else {
-            icon = VaadinIcon.WARNING.create();
-            icon.setColor("yellow");
-        }
-
-        Div texto = new Div();
-        texto.getElement().setProperty("innerHTML", msg);
-
-        HorizontalLayout layout = new HorizontalLayout(icon, texto);
-        layout.setAlignItems(Alignment.CENTER);
-
-        Notification n = new Notification(layout);
-        n.addThemeVariants(variant);
-        n.setPosition(Notification.Position.MIDDLE);
-        n.setDuration(5000);
-
-        n.open();
-    } 
 }
     
     

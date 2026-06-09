@@ -38,7 +38,7 @@ import jakarta.validation.Validator;
 @Route(value = "pagos", layout = MainLayout.class)
 @PageTitle("Pagos")
 @Menu(order = 4, icon = "vaadin:money")
-public class PagoView extends VerticalLayout {
+public class PagoView extends BaseView {
 	
 	private final PagoRepository pagoRepository;
 	private final TerceroRepository terceroRepository;
@@ -253,34 +253,5 @@ public class PagoView extends VerticalLayout {
 		gridPagos.deselectAll();
 		gridPagoDetalles.setItems(Collections.emptyList());	
 	}
-	
-	private void mostrarNotificacion(String mensaje, NotificationVariant variant) {
-		Icon icon;
-
-        if (variant == NotificationVariant.LUMO_SUCCESS) {
-            icon = VaadinIcon.CHECK_CIRCLE.create();
-            icon.setColor("green");
-        } else if (variant == NotificationVariant.LUMO_ERROR) {
-            icon = VaadinIcon.CLOSE_CIRCLE.create();
-            icon.setColor("red");
-        } else {
-            icon = VaadinIcon.WARNING.create();
-            icon.setColor("orange");
-        } 
-
-        Div texto = new Div();
-        texto.getElement().setProperty("innerHTML", mensaje);
-
-        HorizontalLayout layout = new HorizontalLayout(icon, texto);
-        layout.setAlignItems(Alignment.CENTER);
-
-        Notification n = new Notification(layout);
-        n.addThemeVariants(variant);
-        n.setPosition(Notification.Position.MIDDLE);
-        n.setDuration(5000);
-
-        n.open();
-	}
-	
 	
 }

@@ -32,7 +32,7 @@ import jakarta.annotation.security.RolesAllowed;
 @Route(value = "usuarios", layout = MainLayout.class)
 @PageTitle("Usuarios")
 @Menu(order = 5, icon = "vaadin:user-star")
-public class UsuarioView extends VerticalLayout {
+public class UsuarioView extends BaseView {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -60,7 +60,9 @@ public class UsuarioView extends VerticalLayout {
         configurarBuscador();
         
         configurarGrid();
+        
         configurarFormulario();
+        
         configurarBotones();
 
         limpiarFormulario();
@@ -69,7 +71,6 @@ public class UsuarioView extends VerticalLayout {
     // ================= CRUD =================
 
     private void agregarUsuario() {
-
         if (tfNombreUsuario.isEmpty()) {
             mostrarNotificacion("El nombre es obligatorio", NotificationVariant.LUMO_ERROR);
             return;
@@ -98,7 +99,6 @@ public class UsuarioView extends VerticalLayout {
     }
 
     private void actualizarUsuario() {
-
         if (usuarioActual == null || usuarioActual.getId() == null) {
             mostrarNotificacion("Seleccione un usuario", NotificationVariant.LUMO_WARNING);
             return;
@@ -123,7 +123,6 @@ public class UsuarioView extends VerticalLayout {
     }
 
     private void eliminarUsuario() {
-
         if (usuarioActual == null || usuarioActual.getId() == null) {
             mostrarNotificacion("Seleccione un usuario", NotificationVariant.LUMO_WARNING);
             return;
@@ -139,7 +138,6 @@ public class UsuarioView extends VerticalLayout {
     // ================= GRID =================
 
     private void configurarGrid() {
-
         grid.addColumn(Usuario::getId).setHeader("ID");
         grid.addColumn(Usuario::getNombreUsuario).setHeader("Usuario");
         grid.addColumn(Usuario::getRolUsuario).setHeader("Rol");
@@ -237,34 +235,4 @@ public class UsuarioView extends VerticalLayout {
         add(tfBuscar);
     }
 
-    // ================= NOTIFICACIONES =================
-
-    private void mostrarNotificacion(String msg, NotificationVariant variant) {
-
-        Icon icon;
-
-        if (variant == NotificationVariant.LUMO_SUCCESS) {
-            icon = VaadinIcon.CHECK_CIRCLE.create();
-            icon.setColor("green");
-        } else if (variant == NotificationVariant.LUMO_ERROR) {
-            icon = VaadinIcon.CLOSE_CIRCLE.create();
-            icon.setColor("red");
-        } else {
-            icon = VaadinIcon.WARNING.create();
-            icon.setColor("yellow");
-        }
-
-        Div texto = new Div();
-        texto.setText(msg);
-
-        HorizontalLayout layout = new HorizontalLayout(icon, texto);
-        layout.setAlignItems(Alignment.CENTER);
-
-        Notification notification = new Notification(layout);
-        notification.addThemeVariants(variant);
-        notification.setDuration(4000);
-        notification.setPosition(Notification.Position.MIDDLE);
-
-        notification.open();
-    }
 }
