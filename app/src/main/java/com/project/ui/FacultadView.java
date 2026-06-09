@@ -47,12 +47,11 @@ public class FacultadView extends VerticalLayout {
     private IntegerField ifSucursal = new IntegerField("Sucursal");
     private TextField tfTelefonos = new TextField("Teléfonos");
     private TextField tfCorreos = new TextField("Correo");
-    private Checkbox cbDefecto = new Checkbox("Facultad por defecto");
+    private Checkbox cbDefecto = new Checkbox("Por defecto");
 
     private TextField tfBuscar = new TextField();
 
-    
-    
+
     public FacultadView(FacultadRepository repository) {
     	
     	setSizeFull();
@@ -77,28 +76,30 @@ public class FacultadView extends VerticalLayout {
 
     }
     
+    
     // ================= CRUD =================
     
     private void agregarFacultad() {
-
-        
-        Facultad nueva = new Facultad();
-        
+    	
+    	Facultad nuevaFacultad = new Facultad();
+  
+    	if (!binder.validate().isOk()) return;
+    	
         try {
-            binder.writeBean(nueva);
+            binder.writeBean(nuevaFacultad);
             
-            if (facultadRepository.existsByCuit(nueva.getCuit())) {
-                mostrarNotificacion("Ya existe una facultad con ese CUIT", NotificationVariant.LUMO_ERROR);
+            if (facultadRepository.existsByCuit(nuevaFacultad.getCuit())) {
+                mostrarNotificacion("Ya existe una Facultad con ese CUIT", NotificationVariant.LUMO_ERROR);
                 return;
             }
             
-            facultadRepository.save(nueva);
+            facultadRepository.save(nuevaFacultad);
 
             actualizarGrid(tfBuscar.getValue());
 
             mostrarNotificacion("Facultad agregada", NotificationVariant.LUMO_SUCCESS);
             limpiarFormulario();
-
+            
         } catch (ValidationException e) {
         	e.printStackTrace();
         }
@@ -112,13 +113,11 @@ public class FacultadView extends VerticalLayout {
         }
         
         try {
-
             binder.writeBean(facultadActual);
             
             facultadRepository.save(facultadActual);
             
             actualizarGrid(tfBuscar.getValue());
-
             mostrarNotificacion("Facultad actualizada",NotificationVariant.LUMO_SUCCESS);
             limpiarFormulario();
 
@@ -170,7 +169,7 @@ public class FacultadView extends VerticalLayout {
         grid.asSingleSelect().addValueChangeListener(e -> {
             facultadActual = e.getValue();
             if (facultadActual != null) {
-                binder.setBean(facultadActual);
+                binder.setBean(facultadActual); // Binder llena el formulario, cuando el usuario seleccioa una fila.
             }
         });
         add(grid);
@@ -216,19 +215,17 @@ public class FacultadView extends VerticalLayout {
         grid.deselectAll();
     }
     
-   
-    
     private void configurarBotones() {
-        Button btnAgregar = new Button("Agregar", e -> agregarFacultad());
+        Button btnAgregar = new Button("Agregar", VaadinIcon.PLUS.create(), e -> agregarFacultad());
         btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_PRIMARY);
 
-        Button btnActualizar = new Button("Actualizar", e -> actualizarFacultad());
+        Button btnActualizar = new Button("Actualizar", VaadinIcon.EDIT.create(), e -> actualizarFacultad());
         btnActualizar.addClassName("btn-actualizar");
 
-        Button btnEliminar = new Button("Eliminar", e -> eliminarFacultad());
+        Button btnEliminar = new Button("Eliminar", VaadinIcon.TRASH.create(), e -> eliminarFacultad());
         btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
 
-        Button btnLimpiarFormulario = new Button("Limpiar Formulario",e -> limpiarFormulario());
+        Button btnLimpiarFormulario = new Button("Limpiar Formulario", VaadinIcon.ERASER.create(), e -> limpiarFormulario());
         btnLimpiarFormulario.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         btnLimpiarFormulario.getStyle().set("margin-left", "30px");
 
@@ -237,9 +234,7 @@ public class FacultadView extends VerticalLayout {
         add(acciones);
     }
 
-    
     private void actualizarGrid(String filtroNombre) {
-
         if (filtroNombre == null || filtroNombre.isBlank()) {
             grid.setItems(facultadRepository.findAll(Sort.by("id").ascending()));
             return;
@@ -247,7 +242,6 @@ public class FacultadView extends VerticalLayout {
         grid.setItems(facultadRepository.findByNombreContainingIgnoreCaseOrderByIdAsc(filtroNombre));
     }
 
-    
     private void mostrarNotificacion(String msg, NotificationVariant variant) {
 
         Icon icon;
@@ -255,18 +249,13 @@ public class FacultadView extends VerticalLayout {
         if (variant == NotificationVariant.LUMO_SUCCESS) {
             icon = VaadinIcon.CHECK_CIRCLE.create();
             icon.setColor("green");
-
         } else if (variant == NotificationVariant.LUMO_ERROR) {
             icon = VaadinIcon.CLOSE_CIRCLE.create();
             icon.setColor("red");
-
-        } else if (variant == NotificationVariant.LUMO_WARNING) {
-            icon = VaadinIcon.WARNING.create();
-            icon.setColor("orange");
-
         } else {
-            icon = VaadinIcon.INFO_CIRCLE.create();
-            icon.setColor("blue");
+        	//WARNING
+            icon = VaadinIcon.WARNING.create();
+            icon.setColor("yellow");
         }
 
         Div texto = new Div();

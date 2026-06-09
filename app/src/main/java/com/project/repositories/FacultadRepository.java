@@ -12,5 +12,6 @@ import com.vaadin.flow.data.provider.DataProvider;
 public interface FacultadRepository extends JpaRepository<Facultad, Long> {
 	
     boolean existsByCuit(String cuit);
+    
 	List<Facultad> findByNombreContainingIgnoreCaseOrderByIdAsc(String nombre);
 }
