@@ -13,6 +13,8 @@ html {
     --aura-accent-color-dark: var(--aura-purple);
 }
 
+
+
 /* LIGHT MODE (controlado por Vaadin theme attribute) */
 html[theme="light"] {
     color-scheme: light;
