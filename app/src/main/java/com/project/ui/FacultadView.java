@@ -6,16 +6,10 @@ import org.springframework.data.domain.Sort;
 import com.project.models.Facultad;
 import com.project.repositories.FacultadRepository;
 import com.project.ui.base.BaseView;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
@@ -31,10 +25,12 @@ import com.vaadin.flow.data.binder.ValidationException;
 @Menu(order = 1, icon = "vaadin:academy-cap")
 public class FacultadView extends BaseView {
 	
-    private final FacultadRepository facultadRepository;
+	private static final long serialVersionUID = 1L;
+
+	private final FacultadRepository facultadRepository;
 
     private final BeanValidationBinder<Facultad> binder = new BeanValidationBinder<>(Facultad.class);
-    private Grid<Facultad> grid = new Grid<>(Facultad.class, false);
+    private Grid<Facultad> gridFacultad = new Grid<>(Facultad.class, false);
 
     private Facultad facultadActual = new Facultad();
 
@@ -45,46 +41,43 @@ public class FacultadView extends BaseView {
     private TextField tfTelefonos = new TextField("Teléfonos");
     private TextField tfCorreos = new TextField("Correo");
     private Checkbox cbDefecto = new Checkbox("Por defecto");
-
     private TextField tfBuscar = new TextField();
 
+    
 
-    public FacultadView(FacultadRepository repository) {
+	public FacultadView(FacultadRepository repository) {
     	
     	setSizeFull();
         this.facultadRepository = repository;
 
         configurarBinder();
 
-        H1 titulo = new H1("Gestión de Facultades");
-        titulo.setWidthFull();
-        titulo.getStyle().set("text-align", "center");
-        add(titulo);
-
-        configurarBuscador();
-        
+        // ================= TITULO =================
+        add(crearTitulo("Gestión de Facultades"));
+        // ================= BUSCADOR =================
+        add(crearBuscador(tfBuscar));
+        // ================= GRID FACULTADES =================
         configurarGrid();
-        
+        // ================= FORMULARIO =================
         configurarFormulario();
+        // ================= BOTONES =================
+        add(crearBotonesCrud(
+                e -> agregarFacultad(),
+                e -> actualizarFacultad(),
+                e -> eliminarFacultad(),
+                e -> limpiarFormulario()));
         
-        configurarBotones();
-
         limpiarFormulario();
-
     }
     
-    
     // ================= CRUD =================
-    
     private void agregarFacultad() {
     	
         if (!binder.validate().isOk()) return;
-        
 
         Facultad nuevaFacultad = new Facultad();
 
         try {
-        	
             binder.writeBean(nuevaFacultad);
 
             if (facultadRepository.existsByCuit(nuevaFacultad.getCuit())) {
@@ -125,17 +118,18 @@ public class FacultadView extends BaseView {
             mostrarNotificacion("Seleccione una facultad", NotificationVariant.LUMO_WARNING);
             return;
         }
-
-        facultadRepository.delete(facultadActual);
         
-        actualizarGrid(tfBuscar.getValue());
-        mostrarNotificacion("Facultad eliminada", NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();
+        mostrarVentanaDialogo("Eliminarás de la lista la Facultad seleccionada.",
+        		() -> {
+        	        facultadRepository.delete(facultadActual);
+        	        
+        	        actualizarGrid(tfBuscar.getValue());
+        	        mostrarNotificacion("Facultad eliminada", NotificationVariant.LUMO_SUCCESS);
+        	        limpiarFormulario();
+        		});
     }
     
-    
     // ================= HELPERS =================
-    
     private void configurarBinder() {
     	binder.forField(tfNombre).bind("nombre");
 		binder.forField(tfDireccion).bind("direccion");
@@ -147,56 +141,38 @@ public class FacultadView extends BaseView {
     }
     
     private void configurarGrid() {
-        grid.addColumn(Facultad::getId).setHeader("ID");
-        grid.addColumn(Facultad::getNombre).setHeader("Nombre");
-        grid.addColumn(Facultad::getDireccion).setHeader("Dirección");
-        grid.addColumn(Facultad::getCuit).setHeader("CUIT");
-        grid.addColumn(Facultad::getSucursal).setHeader("Sucursal");
-        grid.addColumn(Facultad::getTelefonos).setHeader("Teléfonos");
-        grid.addColumn(Facultad::getCorreos).setHeader("Correo");
-        grid.addColumn(Facultad::getDefecto).setHeader("Por Defecto");
+        gridFacultad.addColumn(Facultad::getId).setHeader("ID");
+        gridFacultad.addColumn(Facultad::getNombre).setHeader("Nombre");
+        gridFacultad.addColumn(Facultad::getDireccion).setHeader("Dirección");
+        gridFacultad.addColumn(Facultad::getCuit).setHeader("CUIT");
+        gridFacultad.addColumn(Facultad::getSucursal).setHeader("Sucursal");
+        gridFacultad.addColumn(Facultad::getTelefonos).setHeader("Teléfonos");
+        gridFacultad.addColumn(Facultad::getCorreos).setHeader("Correo");
+        gridFacultad.addColumn(Facultad::getDefecto).setHeader("Por Defecto");
 
         actualizarGrid(null);
 
-        grid.asSingleSelect().addValueChangeListener(e -> {
+        gridFacultad.asSingleSelect().addValueChangeListener(e -> {
             facultadActual = e.getValue();
             if (facultadActual != null) {
                 binder.setBean(facultadActual); // Binder llena el formulario, cuando el usuario seleccioa una fila.
             }
         });
-        add(grid);
+        add(gridFacultad);
     }  
     
-    private void configurarBuscador() {
-        tfBuscar.setPlaceholder("Buscar Facultad por nombre...");
-        tfBuscar.setClearButtonVisible(true);
-        tfBuscar.setWidth("33%");
-        
-        tfBuscar.addValueChangeListener(e -> actualizarGrid(e.getValue()));
-
-        HorizontalLayout buscadorLayout = new HorizontalLayout(tfBuscar);
-        buscadorLayout.setWidthFull();
-        buscadorLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
-        buscadorLayout.setAlignItems(FlexComponent.Alignment.START);
-
-        add(buscadorLayout);
-    }
+    private void actualizarGrid(String filtroNombre) {
+        if (filtroNombre == null || filtroNombre.isBlank()) {
+            gridFacultad.setItems(facultadRepository.findAll(Sort.by("id").ascending()));
+            return;
+        }
+        gridFacultad.setItems(facultadRepository.findByNombreContainingIgnoreCaseOrderByIdAsc(filtroNombre));
+    } 
     
     private void configurarFormulario() {
         FormLayout form = new FormLayout();
-        form.add(
-                tfNombre,
-                tfDireccion,
-                tfCuit,
-                ifSucursal,
-                tfTelefonos,
-                tfCorreos,
-                cbDefecto
-        );
-        form.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("0", 1),
-                new FormLayout.ResponsiveStep("800px", 3)
-        );
+        form.add(tfNombre,tfDireccion,tfCuit,ifSucursal,tfTelefonos,tfCorreos,cbDefecto);
+        form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1), new FormLayout.ResponsiveStep("800px", 3));
         add(form);
     }
     
@@ -204,34 +180,7 @@ public class FacultadView extends BaseView {
         facultadActual = new Facultad();
         facultadActual.setDefecto(false);
         binder.setBean(facultadActual);
-        grid.deselectAll();
-    }
-    
-    private void configurarBotones() {
-        Button btnAgregar = new Button("Agregar", VaadinIcon.PLUS.create(), e -> agregarFacultad());
-        btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_PRIMARY);
-
-        Button btnActualizar = new Button("Actualizar", VaadinIcon.EDIT.create(), e -> actualizarFacultad());
-        btnActualizar.addClassName("btn-actualizar");
-
-        Button btnEliminar = new Button("Eliminar", VaadinIcon.TRASH.create(), e -> eliminarFacultad());
-        btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
-
-        Button btnLimpiarFormulario = new Button("Limpiar Formulario", VaadinIcon.ERASER.create(), e -> limpiarFormulario());
-        btnLimpiarFormulario.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
-        btnLimpiarFormulario.getStyle().set("margin-left", "30px");
-
-        HorizontalLayout acciones = new HorizontalLayout(btnAgregar, btnActualizar,btnEliminar,btnLimpiarFormulario);
-
-        add(acciones);
+        gridFacultad.deselectAll();
     }
 
-    private void actualizarGrid(String filtroNombre) {
-        if (filtroNombre == null || filtroNombre.isBlank()) {
-            grid.setItems(facultadRepository.findAll(Sort.by("id").ascending()));
-            return;
-        }
-        grid.setItems(facultadRepository.findByNombreContainingIgnoreCaseOrderByIdAsc(filtroNombre));
-    } 
-	
 }

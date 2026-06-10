@@ -6,15 +6,10 @@ import com.project.models.enums.SituacionIVA;
 import com.project.models.enums.TipoSaldo;
 import com.project.repositories.TerceroRepository;
 import com.project.ui.base.BaseView;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -22,7 +17,6 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import jakarta.annotation.security.RolesAllowed;
 
 
@@ -35,11 +29,10 @@ public class TerceroView extends BaseView {
     private final TerceroRepository terceroRepository;
     
     private final BeanValidationBinder<Tercero> binder = new BeanValidationBinder<>(Tercero.class);
-    private Grid<Tercero> grid = new Grid(Tercero.class, false);
+    private Grid<Tercero> gridTercero = new Grid(Tercero.class, false);
     
     private Tercero nuevoTercero = new Tercero();
 
-    // ================= FORM =================
     private TextField tfNombre = new TextField("Nombre");
     private TextField tfCuitl = new TextField("CUIT/L");
     private ComboBox <SituacionIVA> cbSituacionIva = new ComboBox<>("Condición IVA");
@@ -49,54 +42,38 @@ public class TerceroView extends BaseView {
     private TextField tfTelefonos = new TextField("Teléfonos");
     private BigDecimalField bdfSaldoApertura = new BigDecimalField("Saldo Apertura");
     private ComboBox <TipoSaldo> cbTipoSaldo = new ComboBox<>("Tipo Saldo");
-
     private TextField tfBuscar = new TextField();
 
     public TerceroView(TerceroRepository repository) {
     	
     	setSizeFull();
-    	
         this.terceroRepository = repository;
 
         configurarBinder();
-        // ================= HEADER =================
-
+        
+        // ================= TITULO =================
         add(crearTitulo("Gestion de Terceros"));
         // ================= BUSCADOR =================
+        add(crearBuscador(tfBuscar));
         
-        configurarBuscador();
-        
-        // ================= GRID =================
-        
+        // ================= GRID TERCEROS =================        
         configurarGrid();
 
-        // ================= FORM =================
-        
+        // ================= FORMULARIO =================
         configurarFormulario();
         
         // ================= BOTONES =================
-        
-        configurarBotones();  
-        
+        add(crearBotonesCrud(
+                e -> agregarTercero(),
+                e -> actualizarTercero(),
+                e -> eliminarTercero(),
+                e -> limpiarFormulario()));
+         
         limpiarFormulario();
     }
 
     
     // ================= CRUD =================
-
-    private void configurarBinder() {
-		binder.forField(tfNombre).bind("nombre");
-		binder.forField(tfCuitl).bind("cuitl");
-		binder.forField(cbSituacionIva).bind("sitiva");
-		binder.forField(tfDireccion).bind("direccion");
-		binder.forField(tfLocalidad).bind("localidad");
-		binder.forField(tfProvincia).bind("provincia");
-		binder.forField(tfTelefonos).bind("telefonos");
-		binder.forField(bdfSaldoApertura).bind("saldoApertura");
-		binder.forField(cbTipoSaldo).bind("tipoSaldo");
-	}
-
-
 	private void agregarTercero() {
   	
     	if(!binder.validate().isOk()) return;
@@ -119,9 +96,7 @@ public class TerceroView extends BaseView {
             
     	} catch (ValidationException e) {
         	mostrarNotificacion("Error al llenar el Formulario",NotificationVariant.LUMO_ERROR);
-        }
-        
-    		
+        }	
 	}
 
     private void actualizarTercero() {
@@ -138,7 +113,6 @@ public class TerceroView extends BaseView {
         actualizarGrid(tfBuscar.getValue());
         mostrarNotificacion("Tercero actualizado", NotificationVariant.LUMO_SUCCESS);
         limpiarFormulario();     	
-  
     }
 
     private void eliminarTercero() {
@@ -160,80 +134,63 @@ public class TerceroView extends BaseView {
     }
 
     // ================= HELPERS =================
-    private void configurarBotones() {
-        add(crearBotonesCrud(
-                e -> agregarTercero(),
-                e -> actualizarTercero(),
-                e -> eliminarTercero(),
-                e -> limpiarFormulario()));
+    private void configurarBinder() {
+		binder.forField(tfNombre).bind("nombre");
+		binder.forField(tfCuitl).bind("cuitl");
+		binder.forField(cbSituacionIva).bind("sitiva");
+		binder.forField(tfDireccion).bind("direccion");
+		binder.forField(tfLocalidad).bind("localidad");
+		binder.forField(tfProvincia).bind("provincia");
+		binder.forField(tfTelefonos).bind("telefonos");
+		binder.forField(bdfSaldoApertura).bind("saldoApertura");
+		binder.forField(cbTipoSaldo).bind("tipoSaldo");
+	}
+    
+    private void configurarGrid() {
+    	gridTercero.addColumn(Tercero::getId).setHeader("ID");
+        gridTercero.addColumn(Tercero::getNombre).setHeader("Nombre");
+        gridTercero.addColumn(Tercero::getCuitl).setHeader("CUIT/L");
+        gridTercero.addColumn(Tercero::getSitiva).setHeader("IVA");
+        gridTercero.addColumn(Tercero::getDireccion).setHeader("Dirección");
+        gridTercero.addColumn(Tercero::getLocalidad).setHeader("Localidad");
+        gridTercero.addColumn(Tercero::getProvincia).setHeader("Provincia");
+        gridTercero.addColumn(Tercero::getTelefonos).setHeader("Teléfonos");
+        gridTercero.addColumn(Tercero::getSaldoApertura).setHeader("Saldo");
+        gridTercero.addColumn(Tercero::getTipoSaldo).setHeader("Tipo Saldo");
+        
+        actualizarGrid(null);
+
+        gridTercero.asSingleSelect().addValueChangeListener(e -> {
+            nuevoTercero = e.getValue();
+            if (nuevoTercero != null) binder.setBean(nuevoTercero);
+        });
+
+        add(gridTercero);
+    }
+    
+    private void actualizarGrid(String filtroNombre) {
+        if (filtroNombre == null || filtroNombre.isBlank()) {
+            gridTercero.setItems(terceroRepository.findAll(Sort.by("id").ascending()));
+            return;
+        }
+        gridTercero.setItems(terceroRepository.findByNombreContainingIgnoreCaseOrderByIdAsc(filtroNombre));
     }
     
     private void configurarFormulario() {
     	cbTipoSaldo.setItems(TipoSaldo.values());
         cbSituacionIva.setItems(SituacionIVA.values());
+        
         FormLayout form = new FormLayout();
-        form.add(
-                tfNombre,
-                tfCuitl,
-                cbSituacionIva,
-                tfDireccion,
-                tfLocalidad,
-                tfProvincia,
-                tfTelefonos,
-                bdfSaldoApertura,
-                cbTipoSaldo
-        );
-
-        form.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("0", 1),
-                new FormLayout.ResponsiveStep("800px", 3)
-        );
-
+        form.add(tfNombre,tfCuitl,cbSituacionIva,tfDireccion,tfLocalidad,tfProvincia,tfTelefonos,bdfSaldoApertura,cbTipoSaldo);
+        form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1),new FormLayout.ResponsiveStep("800px", 3));
+        
         add(form);
     }
-    
-    private void configurarGrid() {
-    	grid.addColumn(Tercero::getId).setHeader("ID");
-        grid.addColumn(Tercero::getNombre).setHeader("Nombre");
-        grid.addColumn(Tercero::getCuitl).setHeader("CUIT/L");
-        grid.addColumn(Tercero::getSitiva).setHeader("IVA");
-        grid.addColumn(Tercero::getDireccion).setHeader("Dirección");
-        grid.addColumn(Tercero::getLocalidad).setHeader("Localidad");
-        grid.addColumn(Tercero::getProvincia).setHeader("Provincia");
-        grid.addColumn(Tercero::getTelefonos).setHeader("Teléfonos");
-        grid.addColumn(Tercero::getSaldoApertura).setHeader("Saldo");
-        grid.addColumn(Tercero::getTipoSaldo).setHeader("Tipo Saldo");
-        
-        actualizarGrid(null);
 
-        grid.asSingleSelect().addValueChangeListener(e -> {
-            nuevoTercero = e.getValue();
-            if (nuevoTercero != null) binder.setBean(nuevoTercero);
-        });
-
-        add(grid);
-    }
-    
-    private void configurarBuscador() {
-
-        tfBuscar.addValueChangeListener(
-                e -> actualizarGrid(e.getValue()));
-
-        add(crearBuscador(tfBuscar));
-    }
-    
     private void limpiarFormulario() {
         nuevoTercero = new Tercero();  
         binder.setBean(nuevoTercero);
-        grid.deselectAll();
-    }
- 
-    private void actualizarGrid(String filtroNombre) {
-        if (filtroNombre == null || filtroNombre.isBlank()) {
-            grid.setItems(terceroRepository.findAll(Sort.by("id").ascending()));
-            return;
-        }
-        grid.setItems(terceroRepository.findByNombreContainingIgnoreCaseOrderByIdAsc(filtroNombre));
+        gridTercero.deselectAll();
     }
 
 }

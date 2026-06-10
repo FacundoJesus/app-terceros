@@ -1,7 +1,6 @@
 package com.project.ui;
 
 import java.util.Collections;
-
 import com.project.models.Factura;
 import com.project.models.FacturaItem;
 import com.project.models.Tercero;
@@ -20,7 +19,6 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import jakarta.annotation.security.RolesAllowed;
 
 @RolesAllowed({"USER","ADMIN"})
@@ -31,20 +29,16 @@ public class FacturaView extends BaseView {
 
     private final FacturaRepository facturaRepository;
     private final TerceroRepository terceroRepository;
-
     private final BeanValidationBinder<Factura> binderFactura = new BeanValidationBinder<>(Factura.class);
     
     private Grid<Factura> gridFacturas = new Grid<>(Factura.class, false);
     private Grid<FacturaItem> gridItems = new Grid<>(FacturaItem.class, false);
-
     private Factura facturaActual = new Factura();
 
     private DatePicker dpFecha = new DatePicker("Fecha");
     private IntegerField ifNumero = new IntegerField("Número");
     private ComboBox<Tercero> cbTercero = new ComboBox<>("Tercero");
-
     private TextField tfBuscar = new TextField();
-    
     
     public FacturaView(FacturaRepository facturaRepository, TerceroRepository terceroRepository) {
     	
@@ -54,37 +48,32 @@ public class FacturaView extends BaseView {
 
         configurarBinderFactura();
         
-        // ================= HEADER =================
+        // ================= TITULO =================
         add(crearTitulo("Gestion de Facturas"));
 
-
         // ================= BUSCADOR =================
-        configurarBuscador();
+        add(crearBuscador(tfBuscar));
 
         // ================= GRID FACTURAS =================
         configurarGridFacturas();
 
-        // ================= GRID ITEMS =================
+        // ================= GRID ITEMS DE LA FACTURA =================
         add(crearSubtitulo("Items de la Factura"));
-        
         configurarGridFacturaItems();
         
-        // ================= FORM CABECERA =================
+        // ================= FORMULARIO =================
         cargarFormulario();
 
         // ================= BOTONES =================
-        configurarBotones();
+        add(crearBotonesCrud(
+        		e -> agregarFactura(),
+		        e -> actualizarFactura(),
+		        e -> eliminarFactura(),
+		        e -> limpiarFormulario()
+		        ));
         
         limpiarFormulario();
     }
-
-    
-    
-    private void configurarBinderFactura() {
-    	binderFactura.forField(dpFecha).bind("fechaFactura");
-    	binderFactura.forField(ifNumero).bind("numeroFactura");
-    	binderFactura.forField(cbTercero).bind("tercero");
-	}
 
 	// ================= CRUD =================
     private void agregarFactura() {
@@ -94,7 +83,6 @@ public class FacturaView extends BaseView {
     	Factura nuevaFactura = new Factura();
     	
     	try {
-    		
     		binderFactura.writeBean(nuevaFactura);
     		
             facturaRepository.save(nuevaFactura);
@@ -125,7 +113,6 @@ public class FacturaView extends BaseView {
         limpiarFormulario();
     }
     
-    
     private void eliminarFactura() {
     	
         if (facturaActual == null || facturaActual.getId() == null) {
@@ -143,23 +130,13 @@ public class FacturaView extends BaseView {
         		});
     }  
     
-    
+
     // ================= HELPERS =================
-    
-    private void configurarBuscador() {
-        tfBuscar.addValueChangeListener(e -> actualizarGridFacturas(e.getValue()));
-        add(crearBuscador(tfBuscar));
-    }
-    
-    private void cargarFormulario() {
-        cbTercero.setItems(terceroRepository.findAll());
-        cbTercero.setItemLabelGenerator(Tercero::getNombre);
-
-        HorizontalLayout form = new HorizontalLayout(dpFecha,ifNumero,cbTercero);
-
-        form.setWidthFull();
-        add(form);
-    }
+    private void configurarBinderFactura() {
+    	binderFactura.forField(dpFecha).bind("fechaFactura");
+    	binderFactura.forField(ifNumero).bind("numeroFactura");
+    	binderFactura.forField(cbTercero).bind("tercero");
+	}
     
     private void configurarGridFacturas() {
         gridFacturas.addColumn(Factura::getId).setHeader("ID");
@@ -173,7 +150,7 @@ public class FacturaView extends BaseView {
             facturaActual = e.getValue();
             if (facturaActual != null) {
                 binderFactura.setBean(facturaActual);
-                cargarItems(facturaActual);
+                gridItems.setItems(facturaActual.getItems());
             }
         });
 
@@ -202,21 +179,17 @@ public class FacturaView extends BaseView {
         gridItems.setItems(Collections.emptyList());
     }
     
+    private void cargarFormulario() {
+        cbTercero.setItems(terceroRepository.findAll());
+        cbTercero.setItemLabelGenerator(Tercero::getNombre);
 
-    private void cargarItems(Factura f) {
-        gridItems.setItems(f.getItems());
+        HorizontalLayout form = new HorizontalLayout(dpFecha,ifNumero,cbTercero);
+
+        form.setWidthFull();
+        add(form);
     }
-    
-    private void configurarBotones() {
-        add(crearBotonesCrud(
-                e -> agregarFactura(),
-                e -> actualizarFactura(),
-                e -> eliminarFactura(),
-                e -> limpiarFormulario()));
-    }
-    
+          
     private void limpiarFormulario() {
-    	
     	facturaActual = new Factura();
  
     	binderFactura.setBean(facturaActual);
