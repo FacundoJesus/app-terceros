@@ -11,19 +11,23 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'mvn clean package -DskipTests'
+                dir('app') {
+                    bat 'mvn clean package -DskipTests'
+                }
             }
         }
 
         stage('Test') {
             steps {
-                bat 'mvn test'
+                dir('app') {
+                    bat 'mvn test'
+                }
             }
         }
 
         stage('Archive') {
             steps {
-                archiveArtifacts artifacts: 'target/*.jar'
+                archiveArtifacts artifacts: 'app/target/*.jar'
             }
         }
     }
