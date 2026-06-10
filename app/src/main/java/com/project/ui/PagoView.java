@@ -9,6 +9,7 @@ import com.project.models.Tercero;
 import com.project.models.enums.ModoPago;
 import com.project.repositories.PagoRepository;
 import com.project.repositories.TerceroRepository;
+import com.project.ui.base.BaseView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -27,6 +28,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -109,12 +111,22 @@ public class PagoView extends BaseView {
 	private void agregarPago() {
 		
 		if(!binderPago.validate().isOk()) return;
-
-		pagoRepository.save(pagoActual);
 		
-		actualizarGridPagos(tfBuscar.getValue());
-        mostrarNotificacion("Pago agregado", NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();	
+		Pago nuevoPago = new Pago();
+		
+		try {
+			binderPago.writeBean(nuevoPago);
+			
+			pagoRepository.save(nuevoPago);
+			
+			actualizarGridPagos(tfBuscar.getValue());
+	        mostrarNotificacion("Pago agregado", NotificationVariant.LUMO_SUCCESS);
+	        limpiarFormulario();	
+	        
+		} catch(ValidationException ex) {
+			mostrarNotificacion("Error al llenar el Formulario",NotificationVariant.LUMO_ERROR);
+		}
+
 	}
 	
 	private void actualizarPago() {

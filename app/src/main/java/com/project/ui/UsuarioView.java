@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.project.models.Usuario;
 import com.project.models.enums.RolUsuario;
 import com.project.repositories.UsuarioRepository;
+import com.project.ui.base.BaseView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;

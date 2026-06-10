@@ -4,10 +4,12 @@ package com.project.ui;
 
 import org.springframework.data.domain.Sort;
 
+import com.project.models.Facultad;
 import com.project.models.Tercero;
 import com.project.models.enums.SituacionIVA;
 import com.project.models.enums.TipoSaldo;
 import com.project.repositories.TerceroRepository;
+import com.project.ui.base.BaseView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -24,6 +26,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -43,7 +46,7 @@ public class TerceroView extends BaseView {
     private final BeanValidationBinder<Tercero> binder = new BeanValidationBinder<>(Tercero.class);
     private Grid<Tercero> grid = new Grid(Tercero.class, false);
     
-    private Tercero terceroActual = new Tercero();
+    private Tercero nuevoTercero = new Tercero();
 
     // ================= FORM =================
     private TextField tfNombre = new TextField("Nombre");
@@ -110,29 +113,39 @@ public class TerceroView extends BaseView {
   	
     	if(!binder.validate().isOk()) return;
     	
-        if (terceroRepository.existsByCuitl(terceroActual.getCuitl())) {
-            mostrarNotificacion("Ya existe un tercero con ese CUIT", NotificationVariant.LUMO_ERROR);
-            return;
-        }
+    	Tercero nuevoTercero = new Tercero();
+    	
+    	try {
+    		binder.writeBean(nuevoTercero);
+    		
+    		if (terceroRepository.existsByCuitl(nuevoTercero.getCuitl())) {
+                mostrarNotificacion("Ya existe un tercero con ese CUIT", NotificationVariant.LUMO_ERROR);
+                return;
+            }
 
-        terceroRepository.save(terceroActual);
+            terceroRepository.save(nuevoTercero);
+            
+            actualizarGrid(tfBuscar.getValue());
+            mostrarNotificacion("Tercero agregado", NotificationVariant.LUMO_SUCCESS);
+            limpiarFormulario(); 
+            
+    	} catch (ValidationException e) {
+        	mostrarNotificacion("Error al llenar el Formulario",NotificationVariant.LUMO_ERROR);
+        }
         
-        actualizarGrid(tfBuscar.getValue());
-        mostrarNotificacion("Tercero agregado", NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario(); 
     		
 	}
 
     private void actualizarTercero() {
 
-        if (terceroActual == null || terceroActual.getId() == null) {
+        if (nuevoTercero == null || nuevoTercero.getId() == null) {
             mostrarNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
             return;
         }
         
         if(!binder.validate().isOk()) return;
     	
-        terceroRepository.save(terceroActual);
+        terceroRepository.save(nuevoTercero);
 
         actualizarGrid(tfBuscar.getValue());
         mostrarNotificacion("Tercero actualizado", NotificationVariant.LUMO_SUCCESS);
@@ -142,12 +155,12 @@ public class TerceroView extends BaseView {
 
     private void eliminarTercero() {
 
-        if (terceroActual == null || terceroActual.getId() == null) {
+        if (nuevoTercero == null || nuevoTercero.getId() == null) {
             mostrarNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
             return;
         }
 
-        terceroRepository.delete(terceroActual);
+        terceroRepository.delete(nuevoTercero);
 
         actualizarGrid(tfBuscar.getValue());
         mostrarNotificacion("Tercero eliminado", NotificationVariant.LUMO_SUCCESS);
@@ -214,8 +227,8 @@ public class TerceroView extends BaseView {
         actualizarGrid(null);
 
         grid.asSingleSelect().addValueChangeListener(e -> {
-            terceroActual = e.getValue();
-            if (terceroActual != null) binder.setBean(terceroActual);
+            nuevoTercero = e.getValue();
+            if (nuevoTercero != null) binder.setBean(nuevoTercero);
         });
 
         add(grid);
@@ -237,8 +250,8 @@ public class TerceroView extends BaseView {
     }
     
     private void limpiarFormulario() {
-        terceroActual = new Tercero();  
-        binder.setBean(terceroActual);
+        nuevoTercero = new Tercero();  
+        binder.setBean(nuevoTercero);
         grid.deselectAll();
     }
  

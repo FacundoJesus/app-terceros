@@ -7,6 +7,7 @@ import com.project.models.FacturaItem;
 import com.project.models.Tercero;
 import com.project.repositories.FacturaRepository;
 import com.project.repositories.TerceroRepository;
+import com.project.ui.base.BaseView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -24,6 +25,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -105,12 +107,23 @@ public class FacturaView extends BaseView {
     private void agregarFactura() {
 
     	if(!binderFactura.validate().isOk()) return;
-       
-        facturaRepository.save(facturaActual);
-        
-        actualizarGridFacturas(tfBuscar.getValue());
-        mostrarNotificacion("Factura agregada", NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();
+    	
+    	Factura nuevaFactura = new Factura();
+    	
+    	try {
+    		
+    		binderFactura.writeBean(nuevaFactura);
+    		
+            facturaRepository.save(nuevaFactura);
+            
+            actualizarGridFacturas(tfBuscar.getValue());
+            mostrarNotificacion("Factura agregada", NotificationVariant.LUMO_SUCCESS);
+            limpiarFormulario();
+            
+    	} catch(ValidationException ex) {
+    		mostrarNotificacion("Error al llenar el Formulario",NotificationVariant.LUMO_ERROR);
+    	}
+     
     }
     
     private void actualizarFactura() {

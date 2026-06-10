@@ -5,6 +5,7 @@ import com.project.repositories.FacturaRepository;
 import com.project.repositories.FacultadRepository;
 import com.project.repositories.PagoRepository;
 import com.project.repositories.TerceroRepository;
+import com.project.ui.base.BaseView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H1;

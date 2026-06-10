@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 
 import com.project.models.Facultad;
 import com.project.repositories.FacultadRepository;
+import com.project.ui.base.BaseView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -22,6 +23,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.ValidationException;
 
 @RolesAllowed({"USER","ADMIN"})
 @Route(value = "facultades", layout = MainLayout.class)
@@ -76,18 +78,29 @@ public class FacultadView extends BaseView {
     
     private void agregarFacultad() {
     	
-    	if (!binder.validate().isOk()) return;
-    	           
-        if (facultadRepository.existsByCuit(facultadActual.getCuit())) {
-            mostrarNotificacion("Ya existe una Facultad con ese CUIT", NotificationVariant.LUMO_ERROR);
-            return;
-        }
+        if (!binder.validate().isOk()) return;
         
-        facultadRepository.save(facultadActual);
 
-        actualizarGrid(tfBuscar.getValue());
-        mostrarNotificacion("Facultad agregada", NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();
+        Facultad nuevaFacultad = new Facultad();
+
+        try {
+        	
+            binder.writeBean(nuevaFacultad);
+
+            if (facultadRepository.existsByCuit(nuevaFacultad.getCuit())) {
+                mostrarNotificacion("Ya existe una Facultad con ese CUIT",NotificationVariant.LUMO_ERROR);
+                return;
+            }
+
+            facultadRepository.save(nuevaFacultad);
+
+            actualizarGrid(tfBuscar.getValue());
+            mostrarNotificacion("Facultad agregada",NotificationVariant.LUMO_SUCCESS);
+            limpiarFormulario();
+
+        } catch (ValidationException e) {
+        	mostrarNotificacion("Error al llenar el Formulario",NotificationVariant.LUMO_ERROR);
+        }
     }
     
     private void actualizarFacultad() {

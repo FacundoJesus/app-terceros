@@ -1,4 +1,4 @@
-package com.project.ui;
+package com.project.ui.utils;
 
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;

@@ -7,6 +7,7 @@ import java.util.List;
 import com.project.models.enums.SituacionIVA;
 import com.project.models.enums.TipoSaldo;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -78,6 +79,24 @@ public class Tercero {
     @Enumerated(EnumType.STRING)
     @Column(name="tipo_saldo")
     private TipoSaldo tipoSaldo;
+    
+    //RELACION CON FACTURAS
+    @OneToMany(
+    	    mappedBy = "tercero",
+    	    cascade = CascadeType.ALL,
+    	    orphanRemoval = true
+    	)
+    private List<Factura> facturas = new ArrayList<>();
+    
+    //RELACION CON PAGOS
+    @OneToMany(
+    	    mappedBy = "tercero",
+    	    cascade = CascadeType.ALL,
+    	    orphanRemoval = true
+    	)
+    private List<Pago> pagos = new ArrayList<>();
+    
+    
     
 
 }
