@@ -1,10 +1,6 @@
 package com.project.ui;
 
-
-
 import org.springframework.data.domain.Sort;
-
-import com.project.models.Facultad;
 import com.project.models.Tercero;
 import com.project.models.enums.SituacionIVA;
 import com.project.models.enums.TipoSaldo;
@@ -15,14 +11,10 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -31,7 +23,6 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-
 import jakarta.annotation.security.RolesAllowed;
 
 
@@ -69,11 +60,8 @@ public class TerceroView extends BaseView {
 
         configurarBinder();
         // ================= HEADER =================
-        H1 titulo = new H1("Gestión de Terceros");
-        titulo.setWidthFull();
-        titulo.getStyle().set("text-align", "center");
 
-        add(titulo);
+        add(crearTitulo("Gestion de Terceros"));
         // ================= BUSCADOR =================
         
         configurarBuscador();
@@ -159,33 +147,25 @@ public class TerceroView extends BaseView {
             mostrarNotificacion("Seleccione un tercero", NotificationVariant.LUMO_WARNING);
             return;
         }
+        
+        mostrarVentanaDialogo("También se eliminarán las facturas y pagos asociados.",
+                () -> {
+                    terceroRepository.delete(nuevoTercero);
 
-        terceroRepository.delete(nuevoTercero);
-
-        actualizarGrid(tfBuscar.getValue());
-        mostrarNotificacion("Tercero eliminado", NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();
+                    actualizarGrid(tfBuscar.getValue());
+                    mostrarNotificacion("Tercero eliminado", NotificationVariant.LUMO_SUCCESS);
+                    limpiarFormulario();
+                }
+            );
     }
 
     // ================= HELPERS =================
-    
     private void configurarBotones() {
-    	Button btnAgregar = new Button("Agregar", VaadinIcon.PLUS.create(), e -> agregarTercero());
-        btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.PRIMARY);
-
-        Button btnActualizar = new Button("Actualizar", VaadinIcon.EDIT.create(), e -> actualizarTercero());      
-        btnActualizar.addClassName("btn-actualizar");
-        
-        Button btnEliminar = new Button("Eliminar", VaadinIcon.TRASH.create(), e -> eliminarTercero());
-        btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
-        
-        Button btnLimpiarForm = new Button("Limpiar Formulario", VaadinIcon.ERASER.create(), e -> limpiarFormulario());
-        btnLimpiarForm.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
-        btnLimpiarForm.getStyle().set("margin-left", "30px");
-
-        HorizontalLayout acciones = new HorizontalLayout(btnAgregar, btnActualizar, btnEliminar, btnLimpiarForm);
-
-        add(acciones);
+        add(crearBotonesCrud(
+                e -> agregarTercero(),
+                e -> actualizarTercero(),
+                e -> eliminarTercero(),
+                e -> limpiarFormulario()));
     }
     
     private void configurarFormulario() {
@@ -235,18 +215,11 @@ public class TerceroView extends BaseView {
     }
     
     private void configurarBuscador() {
-    	tfBuscar.setPlaceholder("Buscar Tercero por nombre...");
-        tfBuscar.setClearButtonVisible(true);
-        tfBuscar.setWidth("33%");
 
-        tfBuscar.addValueChangeListener(e -> actualizarGrid(e.getValue()));
+        tfBuscar.addValueChangeListener(
+                e -> actualizarGrid(e.getValue()));
 
-        HorizontalLayout buscadorLayout = new HorizontalLayout(tfBuscar);
-        buscadorLayout.setWidthFull();
-        buscadorLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
-        buscadorLayout.setAlignItems(FlexComponent.Alignment.START);
-
-        add(buscadorLayout);
+        add(crearBuscador(tfBuscar));
     }
     
     private void limpiarFormulario() {

@@ -8,20 +8,11 @@ import com.project.models.Tercero;
 import com.project.repositories.FacturaRepository;
 import com.project.repositories.TerceroRepository;
 import com.project.ui.base.BaseView;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -30,7 +21,6 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-
 import jakarta.annotation.security.RolesAllowed;
 
 @RolesAllowed({"USER","ADMIN"})
@@ -65,24 +55,17 @@ public class FacturaView extends BaseView {
         configurarBinderFactura();
         
         // ================= HEADER =================
-        H1 titulo = new H1("Gestión de Facturas");
-        titulo.setWidthFull();
-        titulo.getStyle().set("text-align", "center");
-        add(titulo);
+        add(crearTitulo("Gestion de Facturas"));
 
 
         // ================= BUSCADOR =================
         configurarBuscador();
 
-
         // ================= GRID FACTURAS =================
         configurarGridFacturas();
 
         // ================= GRID ITEMS =================
-        H3 titulo2 = new H3("Items de la Factura");
-        titulo2.setWidthFull();
-        titulo2.getStyle().set("text-align", "center");
-        add(titulo2);
+        add(crearSubtitulo("Items de la Factura"));
         
         configurarGridFacturaItems();
         
@@ -149,31 +132,23 @@ public class FacturaView extends BaseView {
         	mostrarNotificacion("Debes seleccionar una Factura",NotificationVariant.LUMO_WARNING);
         	return;
         }
+        
+        mostrarVentanaDialogo("Se eliminarán las Facturas del Tercero asociado.",
+        		() -> {
+        			facturaRepository.delete(facturaActual);
 
-        facturaRepository.delete(facturaActual);
-
-        actualizarGridFacturas(tfBuscar.getValue());
-        mostrarNotificacion("Factura eliminada",NotificationVariant.LUMO_SUCCESS);
-        limpiarFormulario();     
+        	        actualizarGridFacturas(tfBuscar.getValue());
+        	        mostrarNotificacion("Factura eliminada",NotificationVariant.LUMO_SUCCESS);
+        	        limpiarFormulario();  
+        		});
     }  
     
     
     // ================= HELPERS =================
     
     private void configurarBuscador() {
-        tfBuscar.setPlaceholder("Buscar Factura por nombre...");
-        tfBuscar.setClearButtonVisible(true);
-
-        tfBuscar.setWidth("33%");
-
         tfBuscar.addValueChangeListener(e -> actualizarGridFacturas(e.getValue()));
-
-        HorizontalLayout buscadorLayout = new HorizontalLayout(tfBuscar);
-        buscadorLayout.setWidthFull();
-        buscadorLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
-        buscadorLayout.setAlignItems(FlexComponent.Alignment.START);
-
-        add(buscadorLayout);
+        add(crearBuscador(tfBuscar));
     }
     
     private void cargarFormulario() {
@@ -233,25 +208,11 @@ public class FacturaView extends BaseView {
     }
     
     private void configurarBotones() {
-        Button btnAgregar = new Button("Agregar", VaadinIcon.PLUS.create(), e -> agregarFactura());
-        btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.PRIMARY);
-
-        Button btnActualizar = new Button("Actualizar", VaadinIcon.EDIT.create(), e -> actualizarFactura());
-        btnActualizar.addClassName("btn-actualizar");
-
-        Button btnEliminar = new Button("Eliminar", VaadinIcon.TRASH.create(), e -> eliminarFactura());
-        btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.PRIMARY);
-
-        Button btnLimpiarForm = new Button("Limpiar Formulario", VaadinIcon.ERASER.create(), e -> limpiarFormulario());
-        btnLimpiarForm.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
-        btnLimpiarForm.getStyle().set("margin-left", "30px");
-        HorizontalLayout acciones = new HorizontalLayout(btnAgregar,btnActualizar,btnEliminar,btnLimpiarForm);
-
-        acciones.setWidthFull();
-        acciones.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
-        acciones.setAlignItems(FlexComponent.Alignment.CENTER);
-
-        add(acciones);
+        add(crearBotonesCrud(
+                e -> agregarFactura(),
+                e -> actualizarFactura(),
+                e -> eliminarFactura(),
+                e -> limpiarFormulario()));
     }
     
     private void limpiarFormulario() {

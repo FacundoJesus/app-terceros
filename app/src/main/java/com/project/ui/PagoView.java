@@ -152,6 +152,7 @@ public class PagoView extends BaseView {
 			return;
 		}
 		
+		
 		pagoRepository.delete(pagoActual);
 		
 		actualizarGridPagos(tfBuscar.getValue());
