@@ -2,6 +2,7 @@ package com.project.ui.utils;
 
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 
+// PARA VENTANA DE DIALOGO
 public class DialogUtil {
 
     private DialogUtil() {}
