@@ -23,18 +23,6 @@ public class Application implements AppShellConfigurator {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-    /*
-    @Bean
-    CommandLineRunner testPassword(PasswordEncoder encoder) {
-        return args -> {
-            System.out.println("ADMIN HASH:");
-            System.out.println(encoder.encode("admin"));
-
-            System.out.println("USER HASH:");
-            System.out.println(encoder.encode("user"));
-        };
-    }
-    */
     
     @Bean
     CommandLineRunner init(UsuarioRepository repo, PasswordEncoder encoder) {
