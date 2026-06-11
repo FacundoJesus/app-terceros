@@ -1,29 +1,39 @@
-FROM ghcr.io/jqlang/jq:latest AS jq-stage
-
+# =========================
+# 1. BUILD STAGE
+# =========================
 FROM eclipse-temurin:25-jdk AS build
-COPY --from=jq-stage /jq /usr/bin/jq
-# Test that jq works after copying
-RUN jq --version
 
-ENV HOME=/app
-RUN mkdir -p $HOME
-WORKDIR $HOME
-COPY . $HOME
+WORKDIR /app
 
-# If you have a Vaadin Pro key, pass it as a secret with id "proKey":
-#
-#   $ docker build --secret id=proKey,src=$HOME/.vaadin/proKey .
-#
-# If you have a Vaadin Offline key, pass it as a secret with id "offlineKey":
-#
-#   $ docker build --secret id=offlineKey,src=$HOME/.vaadin/offlineKey .
+# Instalar Maven (más estable que mvnw en Railway)
+RUN apt-get update && apt-get install -y maven
 
-RUN PRO_KEY=$(jq -r ".proKey // empty" /run/secrets/proKey 2>/dev/null || true) && \
-    OFFLINE_KEY=$(cat /run/secrets/offlineKey 2>/dev/null || true) && \
-    ./mvnw clean package -DskipTests \
-      -Dvaadin.proKey="$PRO_KEY" \
-      -Dvaadin.offlineKey="$OFFLINE_KEY"
+# Copiar primero pom para aprovechar cache de dependencias
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
 
+# Copiar el resto del proyecto
+COPY . .
+
+# Build de producción
+RUN mvn clean package -DskipTests -B
+
+
+# =========================
+# 2. RUNTIME STAGE
+# =========================
 FROM eclipse-temurin:25-jre
+
+WORKDIR /app
+
+# Copiar jar generado
 COPY --from=build /app/target/*.jar app.jar
-ENTRYPOINT ["java", "-jar", "/app.jar", "--spring.profiles.active=prod"]
+
+# Railway usa esta variable para el puerto
+ENV PORT=8080
+
+# Exponer puerto (no obligatorio pero recomendado)
+EXPOSE 8080
+
+# Arranque
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT} -jar /app/app.jar"]
