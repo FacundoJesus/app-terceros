@@ -1,5 +1,6 @@
 [build]
-builder = "NIXPACKS"
+builder = "DOCKERFILE"
+dockerfilePath = "app/Dockerfile"
 
 [deploy]
-startCommand = "java -jar target/*.jar"
+startCommand = "java -jar /app.jar --spring.profiles.active=prod"

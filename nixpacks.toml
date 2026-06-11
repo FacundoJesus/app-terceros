@@ -1,8 +1,0 @@
-[phases.setup]
-nixPkgs = ["openjdk17", "maven"]
-
-[phases.build]
-cmds = ["cd app && mvn clean package -DskipTests"]
-
-[start]
-cmd = "java -jar app/target/*.jar"
