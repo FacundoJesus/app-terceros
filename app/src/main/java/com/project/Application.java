@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.project.models.Usuario;
+import com.project.repositories.UsuarioRepository;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 
@@ -20,7 +22,7 @@ public class Application implements AppShellConfigurator {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-    
+    /*
     @Bean
     CommandLineRunner testPassword(PasswordEncoder encoder) {
         return args -> {
@@ -29,6 +31,18 @@ public class Application implements AppShellConfigurator {
 
             System.out.println("USER HASH:");
             System.out.println(encoder.encode("user"));
+        };
+    }
+    */
+    @Bean
+    CommandLineRunner init(UsuarioRepository repo, PasswordEncoder encoder) {
+        return args -> {
+            if (repo.findByUsername("admin").isEmpty()) {
+                Usuario u = new Usuario();
+                u.setNombreUsuario("admin");
+                u.setPassword(encoder.encode("admin"));
+                repo.save(u);
+            }
         };
     }
 }
