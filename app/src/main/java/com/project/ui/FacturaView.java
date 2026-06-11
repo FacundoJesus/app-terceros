@@ -114,7 +114,7 @@ public class FacturaView extends BaseView {
 
 	// ================= CRUD =================
 
-private void agregarFactura() {
+    private void agregarFactura() {
 
     	if(!binderFactura.validate().isOk()) return;
     	
@@ -174,9 +174,8 @@ private void agregarFactura() {
 
         mostrarVentanaDialogo("¿Eliminar item seleccionado?", () -> {
         	        facturaActual.getItems().remove(itemActual);
-        	        facturaActual = facturaRepository.save(facturaActual);    
         	        
-        	        facturaRepository.save(facturaActual);
+        	        facturaActual = facturaRepository.save(facturaActual);    
         	        
         	        gridItems.setItems(facturaActual.getItems());
         	        
@@ -283,6 +282,12 @@ private void agregarFactura() {
     	
         gridFacturas.deselectAll();
         gridItems.setItems(Collections.emptyList());
+        
+        btnAgregarItem.setEnabled(false);
+        btnModificarItem.setEnabled(false);
+        btnEliminarItem.setEnabled(false);
+
+        itemActual = null;
     }
     
     private void abrirDialogoItem(FacturaItem item) {
@@ -311,9 +316,7 @@ private void agregarFactura() {
 
         Button btnGuardar = new Button("Guardar", e -> {
         	
-            if (!binder.validate().isOk()) {
-                return;
-            }
+            if (!binder.validate().isOk()) return;
 
             if (item == null) {
                 itemEditando.setFactura(facturaActual);

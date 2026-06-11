@@ -84,9 +84,9 @@ public abstract class BaseView extends VerticalLayout {
 
 	    btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_PRIMARY);
 
-	    Button btnLimpiar = new Button("Limpiar Formulario", VaadinIcon.ERASER.create(), limpiar);
+	    Button btnLimpiar = new Button("Limpiar", VaadinIcon.ERASER.create(), limpiar);
 	    btnLimpiar.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
-	    btnLimpiar.getStyle().set("margin-left", "30px");
+	    btnLimpiar.getStyle().set("margin-left", "5px");
 
 	    return new HorizontalLayout( btnAgregar,btnActualizar,btnEliminar,btnLimpiar);
 	}
