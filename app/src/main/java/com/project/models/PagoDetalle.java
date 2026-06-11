@@ -45,6 +45,7 @@ public class PagoDetalle {
     @Column(name = "pagorealizado")
     private Boolean pagoRealizado = false;
 
+    //RELACION CON PAGO
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
     		name = "id_pagos",

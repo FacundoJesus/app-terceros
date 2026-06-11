@@ -45,7 +45,7 @@ public class Factura {
 	@Column(name="numero")
 	private Integer numeroFactura;
 
-	// PROVEEDOR-TERCERO
+	// RELACION CON PROVEEDOR-TERCERO
 	@NotNull(message = "Debe seleccionar un tercero")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
@@ -54,7 +54,7 @@ public class Factura {
     )
     private Tercero tercero;
     
-    // ITEMS
+    // RELACION CON FACTURA-ITEMS
     @OneToMany(
             mappedBy = "factura",
             cascade = CascadeType.ALL,

@@ -38,7 +38,7 @@ public class FacturaItem {
     @Column(name = "detalle", length = 300)
     private String detalle;
 
-    // 🔥 RELACIÓN CON FACTURA
+    // RELACIÓN CON FACTURA
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_factura", nullable = false)
     private Factura factura;
