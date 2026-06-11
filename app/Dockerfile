@@ -18,10 +18,11 @@ COPY . $HOME
 #
 #   $ docker build --secret id=offlineKey,src=$HOME/.vaadin/offlineKey .
 
-RUN sh -c './mvnw clean package -DskipTests'
-    sh -c 'PRO_KEY=$(jq -r ".proKey // empty" /run/secrets/proKey 2>/dev/null || echo "") && \
-    OFFLINE_KEY=$(cat /run/secrets/offlineKey 2>/dev/null || echo "") && \
-    ./mvnw clean package -DskipTests -Dvaadin.proKey=${PRO_KEY} -Dvaadin.offlineKey=${OFFLINE_KEY}'
+RUN PRO_KEY=$(jq -r ".proKey // empty" /run/secrets/proKey 2>/dev/null || true) && \
+    OFFLINE_KEY=$(cat /run/secrets/offlineKey 2>/dev/null || true) && \
+    ./mvnw clean package -DskipTests \
+      -Dvaadin.proKey="$PRO_KEY" \
+      -Dvaadin.offlineKey="$OFFLINE_KEY"
 
 FROM eclipse-temurin:25-jre
 COPY --from=build /app/target/*.jar app.jar
