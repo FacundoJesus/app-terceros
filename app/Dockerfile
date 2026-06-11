@@ -27,7 +27,7 @@ FROM eclipse-temurin:25-jre
 WORKDIR /app
 
 # Copiar jar generado
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/app.jar app.jar
 
 # Railway usa esta variable para el puerto
 ENV PORT=8080
