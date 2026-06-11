@@ -52,18 +52,14 @@ public class FacturaView extends BaseView {
         add(crearTitulo("Gestion de Facturas"));
 
         // ================= BUSCADOR =================
-        add(crearBuscador(tfBuscar));
+        configurarBuscador();
 
         // ================= GRID FACTURAS =================
         configurarGridFacturas();
 
-        // ================= GRID ITEMS DE LA FACTURA =================
-        add(crearSubtitulo("Items de la Factura"));
-        configurarGridFacturaItems();
-        
         // ================= FORMULARIO =================
         cargarFormulario();
-
+        
         // ================= BOTONES =================
         add(crearBotonesCrud(
         		e -> agregarFactura(),
@@ -71,7 +67,12 @@ public class FacturaView extends BaseView {
 		        e -> eliminarFactura(),
 		        e -> limpiarFormulario()
 		        ));
-        
+
+        // ================= GRID ITEMS DE LA FACTURA =================
+        add(crearSubtitulo("Items de la Factura Nº:"));
+        configurarGridFacturaItems();
+
+     
         limpiarFormulario();
     }
 
@@ -132,6 +133,11 @@ public class FacturaView extends BaseView {
     
 
     // ================= HELPERS =================
+    private void configurarBuscador() {
+        tfBuscar.addValueChangeListener(e -> actualizarGridFacturas(e.getValue()));
+        add(crearBuscador(tfBuscar));
+    }
+    
     private void configurarBinderFactura() {
     	binderFactura.forField(dpFecha).bind("fechaFactura");
     	binderFactura.forField(ifNumero).bind("numeroFactura");

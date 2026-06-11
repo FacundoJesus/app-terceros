@@ -3,6 +3,7 @@ package com.project.ui;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -141,9 +142,12 @@ public final class MainLayout extends AppLayout {
         VerticalLayout menu = new VerticalLayout();
         menu.add(navPrincipal);
 
-        // 👇 SOLO ADMIN VE TODO ESTO
+        // SOLO ADMIN VE TODO ESTO
         if (esAdmin && !navAdmin.getItems().isEmpty()) {
 
+        	Html salto1 = new Html("<br>");
+        	Html salto2 = new Html("<br>");
+        	
             Span adminLabel = new Span("ADMINISTRACIÓN");
             adminLabel.getStyle()
                     .set("font-size", "var(--lumo-font-size-xs)")
@@ -152,7 +156,7 @@ public final class MainLayout extends AppLayout {
                     .set("margin-top", "1rem")
                     .set("margin-left", "0.5rem");
 
-            menu.add(adminLabel, navAdmin);
+            menu.add(salto1,salto2,adminLabel, navAdmin);
         }
 
         menu.setSpacing(false);

@@ -55,7 +55,7 @@ public class PagoView extends BaseView {
 		add(crearTitulo("Gestión de Pagos"));
 		
 		// ================= BUSCADOR =================
-		add(crearBuscador(tfBuscar));
+		configurarBuscador();
         
         // ================= GRID PAGOS =================
         configurarGridPagos();
@@ -132,6 +132,11 @@ public class PagoView extends BaseView {
 	}
 
 	// ================= HELPERS =================
+    private void configurarBuscador() {
+        tfBuscar.addValueChangeListener(e -> actualizarGridPagos(e.getValue()));
+        add(crearBuscador(tfBuscar));
+    }
+    
     private void configurarBinder() {
     	binderPago.forField(dpFecha).bind("fechaPago");
     	binderPago.forField(bdfMontoPago).bind("montoPago");

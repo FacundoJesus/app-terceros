@@ -55,7 +55,8 @@ public class FacultadView extends BaseView {
         // ================= TITULO =================
         add(crearTitulo("Gestión de Facultades"));
         // ================= BUSCADOR =================
-        add(crearBuscador(tfBuscar));
+        configurarBuscador();
+        
         // ================= GRID FACULTADES =================
         configurarGrid();
         // ================= FORMULARIO =================
@@ -130,6 +131,10 @@ public class FacultadView extends BaseView {
     }
     
     // ================= HELPERS =================
+    private void configurarBuscador() {
+        tfBuscar.addValueChangeListener(e -> actualizarGrid(e.getValue()));
+        add(crearBuscador(tfBuscar));
+    }
     private void configurarBinder() {
     	binder.forField(tfNombre).bind("nombre");
 		binder.forField(tfDireccion).bind("direccion");

@@ -54,7 +54,7 @@ public class TerceroView extends BaseView {
         // ================= TITULO =================
         add(crearTitulo("Gestion de Terceros"));
         // ================= BUSCADOR =================
-        add(crearBuscador(tfBuscar));
+        configurarBuscador();
         
         // ================= GRID TERCEROS =================        
         configurarGrid();
@@ -134,6 +134,11 @@ public class TerceroView extends BaseView {
     }
 
     // ================= HELPERS =================
+    private void configurarBuscador() {
+        tfBuscar.addValueChangeListener(e -> actualizarGrid(e.getValue()));
+        add(crearBuscador(tfBuscar));
+    }
+    
     private void configurarBinder() {
 		binder.forField(tfNombre).bind("nombre");
 		binder.forField(tfCuitl).bind("cuitl");
