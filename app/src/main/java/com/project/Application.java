@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.project.models.Usuario;
+import com.project.models.enums.RolUsuario;
 import com.project.repositories.UsuarioRepository;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.page.AppShellConfigurator;
@@ -42,6 +43,7 @@ public class Application implements AppShellConfigurator {
                 Usuario u = new Usuario();
                 u.setNombreUsuario("admin");
                 u.setPassword(encoder.encode("admin"));
+                u.setRolUsuario(RolUsuario.ADMIN); // 👈 ESTO FALTABA
                 repo.save(u);
             }
         };
