@@ -7,11 +7,16 @@ import com.project.models.Tercero;
 import com.project.repositories.FacturaRepository;
 import com.project.repositories.TerceroRepository;
 import com.project.ui.base.BaseView;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -31,22 +36,37 @@ public class FacturaView extends BaseView {
     private final TerceroRepository terceroRepository;
     private final BeanValidationBinder<Factura> binderFactura = new BeanValidationBinder<>(Factura.class);
     
+    // GRIDS
     private Grid<Factura> gridFacturas = new Grid<>(Factura.class, false);
     private Grid<FacturaItem> gridItems = new Grid<>(FacturaItem.class, false);
     private Factura facturaActual = new Factura();
-
+    private FacturaItem itemActual = new FacturaItem();
+    
+    // CAMPOS FACTURA
     private DatePicker dpFecha = new DatePicker("Fecha");
     private IntegerField ifNumero = new IntegerField("Número");
     private ComboBox<Tercero> cbTercero = new ComboBox<>("Tercero");
+    
     private TextField tfBuscar = new TextField();
+    
+    // BOTONES ITEM
+    private Button btnAgregarItem = new Button("Agregar Item");
+    private Button btnModificarItem = new Button("Modificar Item");
+    private Button btnEliminarItem = new Button("Eliminar Item");
+    
     
     public FacturaView(FacturaRepository facturaRepository, TerceroRepository terceroRepository) {
     	
     	setSizeFull();
         this.facturaRepository = facturaRepository;
         this.terceroRepository = terceroRepository;
+        
+        btnAgregarItem.setEnabled(false);
+        btnModificarItem.setEnabled(false);
+        btnEliminarItem.setEnabled(false);
 
         configurarBinderFactura();
+
         
         // ================= TITULO =================
         add(crearTitulo("Gestion de Facturas"));
@@ -68,16 +88,33 @@ public class FacturaView extends BaseView {
 		        e -> limpiarFormulario()
 		        ));
 
-        // ================= GRID ITEMS DE LA FACTURA =================
-        add(crearSubtitulo("Items de la Factura Nº:"));
-        configurarGridFacturaItems();
+        // ================= GRID ITEMS =================
+        add(crearSubtitulo("Items de la Factura"));
+        configurarGridItems();
+        
+        // ================= BOTONES ITEMS =================
+        btnAgregarItem.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnModificarItem.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnEliminarItem.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        
+        HorizontalLayout accionesItems = new HorizontalLayout(btnAgregarItem,btnModificarItem,btnEliminarItem);
+        
+        btnAgregarItem.addClickListener(e -> abrirDialogoItem(null));
+        btnModificarItem.addClickListener(e -> abrirDialogoItem(itemActual));
+        btnEliminarItem.addClickListener(e -> eliminarItem());
 
-     
+        add(accionesItems);
+
         limpiarFormulario();
+        
+        
+        
     }
 
+
 	// ================= CRUD =================
-    private void agregarFactura() {
+
+private void agregarFactura() {
 
     	if(!binderFactura.validate().isOk()) return;
     	
@@ -130,6 +167,28 @@ public class FacturaView extends BaseView {
         	        limpiarFormulario();  
         		});
     }  
+
+    private void eliminarItem() {
+
+        if (itemActual == null) return;
+
+        mostrarVentanaDialogo("¿Eliminar item seleccionado?", () -> {
+        	        facturaActual.getItems().remove(itemActual);
+        	        facturaActual = facturaRepository.save(facturaActual);    
+        	        
+        	        facturaRepository.save(facturaActual);
+        	        
+        	        gridItems.setItems(facturaActual.getItems());
+        	        
+        	        itemActual = null;
+
+        	        btnModificarItem.setEnabled(false);
+        	        btnEliminarItem.setEnabled(false);
+
+        	        mostrarNotificacion("Item eliminado", NotificationVariant.LUMO_SUCCESS);
+        	    }
+        	);
+    }
     
 
     // ================= HELPERS =================
@@ -143,6 +202,7 @@ public class FacturaView extends BaseView {
     	binderFactura.forField(ifNumero).bind("numeroFactura");
     	binderFactura.forField(cbTercero).bind("tercero");
 	}
+
     
     private void configurarGridFacturas() {
         gridFacturas.addColumn(Factura::getId).setHeader("ID");
@@ -153,23 +213,44 @@ public class FacturaView extends BaseView {
         actualizarGridFacturas(null);
         
         gridFacturas.asSingleSelect().addValueChangeListener(e -> {
+
             facturaActual = e.getValue();
+
             if (facturaActual != null) {
+
                 binderFactura.setBean(facturaActual);
+
                 gridItems.setItems(facturaActual.getItems());
+
+                btnAgregarItem.setEnabled(true);
+
+            } else {
+                btnAgregarItem.setEnabled(false);
+                gridItems.setItems(Collections.emptyList());
             }
         });
-
+        
         add(gridFacturas);
     } 
     
-    private void configurarGridFacturaItems() {
+    
+    private void configurarGridItems() {
         gridItems.addColumn(FacturaItem::getDetalle).setHeader("Detalle");
         gridItems.addColumn(FacturaItem::getCantidad).setHeader("Cantidad");
         gridItems.addColumn(FacturaItem::getMonto).setHeader("Monto");
         
         gridItems.setHeight("200px");
         gridItems.setAllRowsVisible(false);
+        
+        gridItems.asSingleSelect().addValueChangeListener(e -> {
+
+            itemActual = e.getValue();
+
+            boolean seleccionado = itemActual != null;
+
+            btnModificarItem.setEnabled(seleccionado);
+            btnEliminarItem.setEnabled(seleccionado);
+        });
         
         add(gridItems);
     }
@@ -202,6 +283,58 @@ public class FacturaView extends BaseView {
     	
         gridFacturas.deselectAll();
         gridItems.setItems(Collections.emptyList());
+    }
+    
+    private void abrirDialogoItem(FacturaItem item) {
+
+        Dialog dialog = new Dialog();
+
+        TextField tfDetalle = new TextField("Detalle");
+        BigDecimalField bdfCantidad = new BigDecimalField("Cantidad");
+        BigDecimalField bdfMonto = new BigDecimalField("Monto");
+
+        BeanValidationBinder<FacturaItem> binder = new BeanValidationBinder<>(FacturaItem.class);
+
+        binder.forField(tfDetalle).bind("detalle");
+        binder.forField(bdfCantidad).bind("cantidad");
+        binder.forField(bdfMonto).bind("monto");
+
+        FacturaItem itemEditando;
+
+        if (item == null) {
+            itemEditando = new FacturaItem();
+        } else {
+            itemEditando = item;
+        }
+
+        binder.setBean(itemEditando);
+
+        Button btnGuardar = new Button("Guardar", e -> {
+        	
+            if (!binder.validate().isOk()) {
+                return;
+            }
+
+            if (item == null) {
+                itemEditando.setFactura(facturaActual);
+                facturaActual.getItems().add(itemEditando);
+            }
+
+            facturaRepository.save(facturaActual);
+            gridItems.setItems(facturaActual.getItems());
+
+            dialog.close();
+
+            mostrarNotificacion("Item guardado", NotificationVariant.LUMO_SUCCESS);
+        });
+
+        Button btnCancelar = new Button("Cancelar", e -> dialog.close());
+
+        dialog.add(new VerticalLayout(tfDetalle,bdfCantidad, bdfMonto,
+        			new HorizontalLayout(btnGuardar,btnCancelar))
+        );
+
+        dialog.open();
     }
     
 }
