@@ -13,6 +13,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -56,6 +57,8 @@ public class FacturaView extends BaseView {
     private Button btnModificarItem = new Button("Modificar Item");
     private Button btnEliminarItem = new Button("Eliminar Item");
     
+    private H3 subtituloItem;
+    
     
     public FacturaView(FacturaRepository facturaRepository, TerceroRepository terceroRepository) {
     	
@@ -90,7 +93,9 @@ public class FacturaView extends BaseView {
 		        ));
 
         // ================= GRID ITEMS =================
-        add(crearSubtitulo("Items de la Factura"));
+        subtituloItem = crearSubtitulo("Items de la Factura");
+        add(subtituloItem);
+        
         configurarGridItems();
         
         // ================= BOTONES ITEMS =================
@@ -108,13 +113,10 @@ public class FacturaView extends BaseView {
 
         limpiarFormulario();
         
-        
-        
     }
 
 
 	// ================= CRUD =================
-
     private void agregarFactura() {
 
     	if(!binderFactura.validate().isOk()) return;
@@ -218,8 +220,9 @@ public class FacturaView extends BaseView {
             if (facturaActual != null) {
 
                 binderFactura.setBean(facturaActual);
-
                 gridItems.setItems(facturaActual.getItems());
+                
+                subtituloItem.setText("Items de la Factura N° " + facturaActual.getNumeroFactura());
 
                 btnAgregarItem.setEnabled(true);
 
@@ -281,6 +284,7 @@ public class FacturaView extends BaseView {
     	
         gridFacturas.deselectAll();
         gridItems.setItems(Collections.emptyList());
+        subtituloItem.setText("Items de la Factura");
         
         btnAgregarItem.setEnabled(false);
         btnModificarItem.setEnabled(false);

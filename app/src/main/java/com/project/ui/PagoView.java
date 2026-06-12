@@ -11,6 +11,7 @@ import com.project.ui.base.BaseView;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
@@ -45,6 +46,8 @@ public class PagoView extends BaseView {
 	private ComboBox<Tercero> cbTercero = new ComboBox<>("Tercero");
 	private TextField tfBuscar = new TextField();
 	
+	private H3 subtDetalleP;
+	
 	public PagoView(PagoRepository pagoRepository, TerceroRepository terceroRepository) {
 		
 		this.terceroRepository = terceroRepository;
@@ -63,7 +66,8 @@ public class PagoView extends BaseView {
         configurarGridPagos();
         
         // ================= GRID DETALLES DEL PAGO =================
-        add(crearSubtitulo("Detalles del Pago"));
+        subtDetalleP = crearSubtitulo("Detalles del Pago");
+        add(subtDetalleP);
         configurarGridPagoDetalles();
         
         // ================= FORMULARIO =================
@@ -160,6 +164,7 @@ public class PagoView extends BaseView {
 			if(pagoActual != null) {
 				binderPago.setBean(pagoActual);
 				gridPagoDetalles.setItems(pagoActual.getPagosDetalles());
+				subtDetalleP.setText("Detalle del Pago: " + pagoActual.getTercero().getNombre());
 			}
 		});		
 		add(gridPagos);
@@ -207,6 +212,7 @@ public class PagoView extends BaseView {
 		
 		binderPago.setBean(pagoActual);
 		
+        subtDetalleP.setText("Detalles del Pago");
 		gridPagos.deselectAll();
 		gridPagoDetalles.setItems(Collections.emptyList());	
 	}
