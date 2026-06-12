@@ -9,6 +9,7 @@ import com.project.repositories.UsuarioRepository;
 import com.project.ui.base.BaseView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
@@ -35,7 +36,9 @@ import jakarta.annotation.security.RolesAllowed;
 @Menu(order = 5, icon = "vaadin:user-star")
 public class UsuarioView extends BaseView {
 
-    private final UsuarioRepository usuarioRepository;
+	private static final long serialVersionUID = 1L;
+	
+	private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
     private Grid<Usuario> grid = new Grid<>(Usuario.class, false);
@@ -44,33 +47,40 @@ public class UsuarioView extends BaseView {
 
     private TextField tfNombreUsuario = new TextField("Nombre de Usuario");
     private PasswordField pfContraseña = new PasswordField("Contraseña");
+    private ComboBox<RolUsuario> cbRolUser = new ComboBox<>("Rol Usuario");
     private TextField tfBuscar = new TextField();
 
-    public UsuarioView(UsuarioRepository repository, PasswordEncoder passwordEncoder) {
+    public UsuarioView(UsuarioRepository userRepository, PasswordEncoder passwordEncoder) {
 
         setSizeFull();
-
-        this.usuarioRepository = repository;
+        this.usuarioRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
 
-        H1 titulo = new H1("Gestión de Usuarios");
-        titulo.setWidthFull();
-        titulo.getStyle().set("text-align", "center");
-        add(titulo);
+        // ================= TITULO =================
+        add(crearTitulo("Gestión de Usuarios"));
 
+        // ================= BUSCADOR =================
         configurarBuscador();
         
+        // ================= GRID =================
         configurarGrid();
         
         configurarFormulario();
         
-        configurarBotones();
-
+        // ================= BOTONES =================
+        add(crearBotonesCrud(
+        		e -> agregarUsuario(),
+		        e -> actualizarUsuario(),
+		        e -> eliminarUsuario(),
+		        e -> limpiarFormulario()
+		        ));
+ 
         limpiarFormulario();
     }
 
+    
+    
     // ================= CRUD =================
-
     private void agregarUsuario() {
         if (tfNombreUsuario.isEmpty()) {
             mostrarNotificacion("El nombre es obligatorio", NotificationVariant.LUMO_ERROR);
@@ -83,7 +93,7 @@ public class UsuarioView extends BaseView {
         }
 
         if (usuarioRepository.existsByNombreUsuario(tfNombreUsuario.getValue())) {
-            mostrarNotificacion("El usuario ya existe", NotificationVariant.LUMO_ERROR);
+            mostrarNotificacion("El usuario con ese nombre ya existe", NotificationVariant.LUMO_ERROR);
             return;
         }
 
@@ -91,7 +101,7 @@ public class UsuarioView extends BaseView {
 
         nuevo.setNombreUsuario(tfNombreUsuario.getValue());
         nuevo.setPassword(passwordEncoder.encode(pfContraseña.getValue()));
-        nuevo.setRolUsuario(RolUsuario.USER);
+        nuevo.setRolUsuario(cbRolUser.getValue());
 
         usuarioRepository.save(nuevo);
 
@@ -136,11 +146,10 @@ public class UsuarioView extends BaseView {
         limpiarFormulario();
     }
 
-    // ================= GRID =================
-
     private void configurarGrid() {
         grid.addColumn(Usuario::getId).setHeader("ID");
         grid.addColumn(Usuario::getNombreUsuario).setHeader("Usuario");
+        grid.addColumn(Usuario::getPassword).setHeader("Contraseña");
         grid.addColumn(Usuario::getRolUsuario).setHeader("Rol");
 
         actualizarGrid(null);
@@ -151,7 +160,10 @@ public class UsuarioView extends BaseView {
 
             if (usuarioActual != null) {
                 tfNombreUsuario.setValue(usuarioActual.getNombreUsuario());
-                pfContraseña.clear();
+                cbRolUser.setValue(usuarioActual.getRolUsuario());
+                tfNombreUsuario.setValue(usuarioActual.getNombreUsuario());
+                pfContraseña.setValue(usuarioActual.getPassword());
+                
             } else {
                 limpiarFormulario();
             }
@@ -176,54 +188,27 @@ public class UsuarioView extends BaseView {
     private void configurarFormulario() {
 
         FormLayout form = new FormLayout();
+        cbRolUser.setItems(RolUsuario.values());
 
-        form.add(tfNombreUsuario, pfContraseña);
+        form.add(tfNombreUsuario, pfContraseña, cbRolUser);
 
         form.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
-                new FormLayout.ResponsiveStep("800px", 2)
+                new FormLayout.ResponsiveStep("800px", 3)
         );
 
         add(form);
     }
 
     private void limpiarFormulario() {
-
         usuarioActual = null;
 
         tfNombreUsuario.clear();
         pfContraseña.clear();
-
+        cbRolUser.clear();
+        
         grid.deselectAll();
     }
-
-    // ================= BOTONES =================
-
-    private void configurarBotones() {
-
-        Button btnAgregar = new Button("Agregar", VaadinIcon.PLUS.create(), e -> agregarUsuario());
-        btnAgregar.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
-
-        Button btnActualizar = new Button("Actualizar", VaadinIcon.EDIT.create(), e -> actualizarUsuario());
-        btnActualizar.addClassName("btn-actualizar");
-        
-        Button btnEliminar = new Button("Eliminar", VaadinIcon.TRASH.create(), e -> eliminarUsuario());
-        btnEliminar.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
-
-        Button btnLimpiar = new Button("Limpiar Formulario", VaadinIcon.ERASER.create(), e -> limpiarFormulario());
-        btnLimpiar.getStyle().set("margin-left", "30px");
-        
-        HorizontalLayout acciones = new HorizontalLayout(
-                btnAgregar,
-                btnActualizar,
-                btnEliminar,
-                btnLimpiar
-        );
-
-        add(acciones);
-    }
-
-    // ================= BUSCADOR =================
 
     private void configurarBuscador() {
 

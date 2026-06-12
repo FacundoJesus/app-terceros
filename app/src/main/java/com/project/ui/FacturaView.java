@@ -32,7 +32,9 @@ import jakarta.annotation.security.RolesAllowed;
 @Menu(order = 3, icon = "vaadin:invoice")
 public class FacturaView extends BaseView {
 
-    private final FacturaRepository facturaRepository;
+	private static final long serialVersionUID = 1L;
+	
+	private final FacturaRepository facturaRepository;
     private final TerceroRepository terceroRepository;
     private final BeanValidationBinder<Factura> binderFactura = new BeanValidationBinder<>(Factura.class);
     
@@ -67,7 +69,6 @@ public class FacturaView extends BaseView {
 
         configurarBinderFactura();
 
-        
         // ================= TITULO =================
         add(crearTitulo("Gestion de Facturas"));
 
@@ -170,7 +171,7 @@ public class FacturaView extends BaseView {
 
     private void eliminarItem() {
 
-        if (itemActual == null) return;
+        //if (itemActual == null) return;
 
         mostrarVentanaDialogo("¿Eliminar item seleccionado?", () -> {
         	        facturaActual.getItems().remove(itemActual);
@@ -202,7 +203,6 @@ public class FacturaView extends BaseView {
     	binderFactura.forField(cbTercero).bind("tercero");
 	}
 
-    
     private void configurarGridFacturas() {
         gridFacturas.addColumn(Factura::getId).setHeader("ID");
         gridFacturas.addColumn(Factura::getFechaFactura).setHeader("Fecha");
@@ -227,8 +227,7 @@ public class FacturaView extends BaseView {
                 btnAgregarItem.setEnabled(false);
                 gridItems.setItems(Collections.emptyList());
             }
-        });
-        
+        });      
         add(gridFacturas);
     } 
     
@@ -238,7 +237,7 @@ public class FacturaView extends BaseView {
         gridItems.addColumn(FacturaItem::getCantidad).setHeader("Cantidad");
         gridItems.addColumn(FacturaItem::getMonto).setHeader("Monto");
         
-        gridItems.setHeight("200px");
+        gridItems.setHeight("250px");
         gridItems.setAllRowsVisible(false);
         
         gridItems.asSingleSelect().addValueChangeListener(e -> {
@@ -333,7 +332,7 @@ public class FacturaView extends BaseView {
 
         Button btnCancelar = new Button("Cancelar", e -> dialog.close());
 
-        dialog.add(new VerticalLayout(tfDetalle,bdfCantidad, bdfMonto,
+        dialog.add(new VerticalLayout(tfDetalle,bdfCantidad,bdfMonto,
         			new HorizontalLayout(btnGuardar,btnCancelar))
         );
 

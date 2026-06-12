@@ -17,6 +17,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 public abstract class BaseView extends VerticalLayout {
 	
+	private static final long serialVersionUID = 1L;
+
 	// MENSAJE EXITO O ERROR
 	protected void mostrarNotificacion(String mensaje, NotificationVariant variant) {
 		NotificationUtil.mostrar(mensaje,variant);

@@ -28,6 +28,8 @@ import jakarta.annotation.security.RolesAllowed;
 @PageTitle("Pagos")
 @Menu(order = 4, icon = "vaadin:money")
 public class PagoView extends BaseView {
+
+	private static final long serialVersionUID = 1L;
 	
 	private final PagoRepository pagoRepository;
 	private final TerceroRepository terceroRepository;
@@ -169,7 +171,7 @@ public class PagoView extends BaseView {
 		gridPagoDetalles.addColumn(PagoDetalle::getBanco).setHeader("Banco");
 		gridPagoDetalles.addColumn(PagoDetalle::getPagoRealizado).setHeader("Pago realizado");
 		
-        gridPagoDetalles.setHeight("200px");
+        gridPagoDetalles.setHeight("250px");
         gridPagoDetalles.setAllRowsVisible(false);
         
         add(gridPagoDetalles);	

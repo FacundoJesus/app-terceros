@@ -21,7 +21,8 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @AnonymousAllowed
 public class LoginView extends Main implements BeforeEnterObserver {
 
-    private final LoginForm login;
+	private static final long serialVersionUID = 1L;
+	private final LoginForm login;
 
     public LoginView() {
 

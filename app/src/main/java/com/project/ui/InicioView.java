@@ -29,7 +29,9 @@ import jakarta.annotation.security.RolesAllowed;
 @Menu(order = 0, icon = "vaadin:home")
 public class InicioView extends BaseView {
 
-    public InicioView(FacultadRepository facultadRepository, TerceroRepository terceroRepository,
+	private static final long serialVersionUID = 1L;
+
+	public InicioView(FacultadRepository facultadRepository, TerceroRepository terceroRepository,
     				  FacturaRepository facturaRepository, PagoRepository pagoRepository) {
 
         setSizeFull();

@@ -24,7 +24,7 @@ public class NotificationUtil {
             icon.setColor("red");
         } else {
             icon = VaadinIcon.WARNING.create();
-            icon.setColor("orange");
+            icon.setColor("yellow");
         }
 
         Div text = new Div();

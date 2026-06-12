@@ -26,7 +26,9 @@ import jakarta.annotation.security.RolesAllowed;
 @Menu(order = 2, icon = "vaadin:users")
 public class TerceroView extends BaseView {
 
-    private final TerceroRepository terceroRepository;
+	private static final long serialVersionUID = 1L;
+
+	private final TerceroRepository terceroRepository;
     
     private final BeanValidationBinder<Tercero> binder = new BeanValidationBinder<>(Tercero.class);
     private Grid<Tercero> gridTercero = new Grid(Tercero.class, false);

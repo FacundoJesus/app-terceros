@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,6 +40,7 @@ public class Usuario {
 	@Column(name= "password_usuario", nullable=false, length=60)
 	private String password;
 	
+	@NotNull(message = "El Rol es obligatorio")
 	@Enumerated(EnumType.STRING) 
 	@Column(name= "rol_usuario", nullable=false)
 	private RolUsuario rolUsuario;
