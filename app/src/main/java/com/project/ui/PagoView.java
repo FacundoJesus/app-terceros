@@ -8,12 +8,17 @@ import com.project.models.enums.ModoPago;
 import com.project.repositories.PagoRepository;
 import com.project.repositories.TerceroRepository;
 import com.project.ui.base.BaseView;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -46,6 +51,12 @@ public class PagoView extends BaseView {
 	private ComboBox<Tercero> cbTercero = new ComboBox<>("Tercero");
 	private TextField tfBuscar = new TextField();
 	
+    // BOTONES ITEM
+    private Button btnAgregarDetalle = new Button("Agregar Detalle");
+    private Button btnModificarDetalle = new Button("Modificar Detalle");
+    private Button btnEliminarDetalle = new Button("Eliminar Detalle");
+    private PagoDetalle detalleActual = new PagoDetalle();
+    
 	private H3 subtDetalleP;
 	
 	public PagoView(PagoRepository pagoRepository, TerceroRepository terceroRepository) {
@@ -53,7 +64,7 @@ public class PagoView extends BaseView {
 		this.terceroRepository = terceroRepository;
 		this.pagoRepository = pagoRepository;
 		setSizeFull();
-		
+			
 		configurarBinder();
 
 		// ================= TITULO =================
@@ -64,12 +75,7 @@ public class PagoView extends BaseView {
         
         // ================= GRID PAGOS =================
         configurarGridPagos();
-        
-        // ================= GRID DETALLES DEL PAGO =================
-        subtDetalleP = crearSubtitulo("Detalles del Pago");
-        add(subtDetalleP);
-        configurarGridPagoDetalles();
-        
+       
         // ================= FORMULARIO =================
         cargarFormulario();
 
@@ -79,6 +85,25 @@ public class PagoView extends BaseView {
                 e -> actualizarPago(),
                 e -> eliminarPago(),
                 e -> limpiarFormulario()));
+        
+        // ================= GRID DETALLES DEL PAGO =================
+        subtDetalleP = crearSubtitulo("Detalles del Pago");
+        add(subtDetalleP);
+        configurarGridPagoDetalles();
+        
+        // ================= BOTONES ITEMS =================
+        btnAgregarDetalle.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnModificarDetalle.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnEliminarDetalle.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        
+        HorizontalLayout accionesItems = new HorizontalLayout(btnAgregarDetalle,btnModificarDetalle,btnEliminarDetalle);
+        
+        btnAgregarDetalle.addClickListener(e -> abrirDialogoDetalle(null));
+        btnModificarDetalle.addClickListener(e -> abrirDialogoDetalle(detalleActual));
+        btnEliminarDetalle.addClickListener(e -> eliminarDetalle());
+
+        add(accionesItems);
+        
         
         limpiarFormulario();
 	}
@@ -136,6 +161,27 @@ public class PagoView extends BaseView {
 			        limpiarFormulario();
 				});
 	}
+	
+    private void eliminarDetalle() {
+
+        //if (itemActual == null) return;
+
+        mostrarVentanaDialogo("¿Eliminar item seleccionado?", () -> {
+        	        pagoActual.getPagosDetalles().remove(pagoActual);
+        	        
+        	        pagoActual = pagoRepository.save(pagoActual);    
+        	        
+        	        gridPagoDetalles.setItems(pagoActual.getPagosDetalles());
+        	        
+        	        detalleActual = null;
+
+        	        btnModificarDetalle.setEnabled(false);
+        	        btnEliminarDetalle.setEnabled(false);
+
+        	        mostrarNotificacion("Item eliminado", NotificationVariant.LUMO_SUCCESS);
+        	    }
+        	);
+    }
 
 	// ================= HELPERS =================
     private void configurarBuscador() {
@@ -165,6 +211,7 @@ public class PagoView extends BaseView {
 				binderPago.setBean(pagoActual);
 				gridPagoDetalles.setItems(pagoActual.getPagosDetalles());
 				subtDetalleP.setText("Detalle del Pago: " + pagoActual.getTercero().getNombre());
+				btnAgregarDetalle.setEnabled(true);
 			}
 		});		
 		add(gridPagos);
@@ -178,6 +225,15 @@ public class PagoView extends BaseView {
 		
         gridPagoDetalles.setHeight("250px");
         gridPagoDetalles.setAllRowsVisible(false);
+        
+        gridPagoDetalles.asSingleSelect().addValueChangeListener(e -> {
+
+            detalleActual = e.getValue();
+
+            boolean seleccionado = pagoActual != null;
+            btnModificarDetalle.setEnabled(seleccionado);
+            btnEliminarDetalle.setEnabled(seleccionado);
+        });
         
         add(gridPagoDetalles);	
 	}
@@ -215,6 +271,62 @@ public class PagoView extends BaseView {
         subtDetalleP.setText("Detalles del Pago");
 		gridPagos.deselectAll();
 		gridPagoDetalles.setItems(Collections.emptyList());	
+		
+        btnAgregarDetalle.setEnabled(false);
+        btnModificarDetalle.setEnabled(false);
+        btnEliminarDetalle.setEnabled(false);
 	}
+	
+	private void abrirDialogoDetalle(PagoDetalle detalle) {
+
+        Dialog dialog = new Dialog();
+
+        TextField tfNinstrumento= new TextField("Nº Instrumento");
+        DatePicker dpFecha = new DatePicker("Fecha de Instrumento");
+        TextField tfBanco = new TextField("Banco");
+        Checkbox chbPRealizado = new Checkbox("Pago Realizado");
+
+        BeanValidationBinder<PagoDetalle> binder = new BeanValidationBinder<>(PagoDetalle.class);
+
+        binder.forField(tfNinstrumento).bind("instrumentNumber");
+        binder.forField(dpFecha).bind("instrumentDate");
+        binder.forField(tfBanco).bind("banco");
+        binder.forField(chbPRealizado).bind("pagoRealizado");
+
+
+        PagoDetalle pagoEditando;
+
+        if (detalle == null) {
+            pagoEditando = new PagoDetalle();
+        } else {
+            pagoEditando = detalle;
+        }
+
+        binder.setBean(pagoEditando);
+
+        Button btnGuardar = new Button("Guardar", e -> {
+        	
+            if (!binder.validate().isOk()) return;
+
+            if (detalle == null) {
+                pagoEditando.setPago(pagoActual);
+                pagoActual.getPagosDetalles().add(pagoEditando);
+            }
+
+            pagoRepository.save(pagoActual);
+            gridPagoDetalles.setItems(pagoActual.getPagosDetalles());
+
+            dialog.close();
+
+            mostrarNotificacion("Pago guardado", NotificationVariant.LUMO_SUCCESS);
+        });
+
+        Button btnCancelar = new Button("Cancelar", e -> dialog.close());
+
+        dialog.add(new VerticalLayout(tfNinstrumento,dpFecha,tfBanco,chbPRealizado,
+        			new HorizontalLayout(btnGuardar,btnCancelar)));
+
+        dialog.open();
+    }
 	
 }

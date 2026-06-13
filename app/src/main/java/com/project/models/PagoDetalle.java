@@ -31,18 +31,20 @@ public class PagoDetalle {
     @Column(name = "id_pagosdetalle")
     private Long id;
 
-    @NotBlank
+    @NotBlank(message="N° Instrumento obligatorio")
     @Column(name = "instrumentnumber", nullable = false, length = 15)
     private String instrumentNumber;
 
-    @NotNull
+    @NotNull(message="Fecha Instrumento obligatorio")
     @Column(name = "instrumentdate", nullable = false)
     private LocalDate instrumentDate;
 
-    @Column(name = "banco", length = 100)
+    @NotBlank(message="El Banco es obligatorio")
+    @Column(name = "banco", length = 100, nullable=false)
     private String banco;
 
-    @Column(name = "pagorealizado")
+    @NotNull(message="Pago Realizado. SI o NO")
+    @Column(name = "pagorealizado",nullable=false)
     private Boolean pagoRealizado = false;
 
     //RELACION CON PAGO

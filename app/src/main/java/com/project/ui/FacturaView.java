@@ -65,10 +65,6 @@ public class FacturaView extends BaseView {
     	setSizeFull();
         this.facturaRepository = facturaRepository;
         this.terceroRepository = terceroRepository;
-        
-        btnAgregarItem.setEnabled(false);
-        btnModificarItem.setEnabled(false);
-        btnEliminarItem.setEnabled(false);
 
         configurarBinderFactura();
 
@@ -300,7 +296,6 @@ public class FacturaView extends BaseView {
         TextField tfDetalle = new TextField("Detalle");
         BigDecimalField bdfCantidad = new BigDecimalField("Cantidad");
         BigDecimalField bdfMonto = new BigDecimalField("Monto");
-
         BeanValidationBinder<FacturaItem> binder = new BeanValidationBinder<>(FacturaItem.class);
 
         binder.forField(tfDetalle).bind("detalle");
@@ -308,7 +303,6 @@ public class FacturaView extends BaseView {
         binder.forField(bdfMonto).bind("monto");
 
         FacturaItem itemEditando;
-
         if (item == null) {
             itemEditando = new FacturaItem();
         } else {
@@ -317,15 +311,12 @@ public class FacturaView extends BaseView {
 
         binder.setBean(itemEditando);
 
-        Button btnGuardar = new Button("Guardar", e -> {
-        	
+        Button btnGuardar = new Button("Guardar", e -> {	
             if (!binder.validate().isOk()) return;
-
             if (item == null) {
                 itemEditando.setFactura(facturaActual);
                 facturaActual.getItems().add(itemEditando);
             }
-
             facturaRepository.save(facturaActual);
             gridItems.setItems(facturaActual.getItems());
 
@@ -335,11 +326,10 @@ public class FacturaView extends BaseView {
         });
 
         Button btnCancelar = new Button("Cancelar", e -> dialog.close());
-
+        
         dialog.add(new VerticalLayout(tfDetalle,bdfCantidad,bdfMonto,
         			new HorizontalLayout(btnGuardar,btnCancelar))
         );
-
         dialog.open();
     }
     
