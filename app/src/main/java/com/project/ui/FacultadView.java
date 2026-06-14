@@ -43,8 +43,6 @@ public class FacultadView extends BaseView {
     private Checkbox cbDefecto = new Checkbox("Por defecto");
     private TextField tfBuscar = new TextField();
 
-    
-
 	public FacultadView(FacultadRepository repository) {
     	
     	setSizeFull();
