@@ -29,6 +29,7 @@ public class LoginView extends Main implements BeforeEnterObserver {
         login = new LoginForm();
         login.setAction("login");
 
+        
         H2 titulo = new H2("App Terceros");
         titulo.getStyle()
                 .set("margin-top", "0")
@@ -43,11 +44,17 @@ public class LoginView extends Main implements BeforeEnterObserver {
             AvatarVariant.AURA_FILLED,
             AvatarVariant.LARGE
         );
+        
+        Span credenciales = new Span("Username: user1 | Password: user1");
+        credenciales.getStyle()
+                .set("font-size", "1em")
+                .set("color", "gray");
 
         VerticalLayout card = new VerticalLayout(
         		avatar,
                 titulo,
                 subtitulo,
+                credenciales,
                 login
         );
 
