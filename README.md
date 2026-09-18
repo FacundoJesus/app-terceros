@@ -1,159 +1,71 @@
-# UTN – FRP
+# 🏢 Sistema de Gestión de Terceros
 
-## Programación III – Trabajo Práctico Final
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-F2F4F9?style=for-the-badge&logo=spring-boot)
+![Vaadin](https://img.shields.io/badge/Vaadin-00B4F0?style=for-the-badge&logo=vaadin&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 
-### Objetivo
-
-El objetivo del trabajo práctico es comprobar que el alumno está en condiciones de desarrollar una aplicación web completa, abarcando:
-
-* Interfaz de usuario (**Frontend**)
-* Lógica de negocio (**Backend**)
-* Diseño y gestión de datos (**Base de Datos**)
-
-Para ello, cada equipo (máximo **dos alumnos**) deberá desarrollar la aplicación utilizando exclusivamente las siguientes tecnologías:
-
-* **Vaadin Flow** o **Vaadin Hilla**
-* **Spring Boot**
-* **PostgreSQL**
+> **🚀 Proyecto Desplegado:** [Acceder a la aplicación (Render)](https://app-terceros.onrender.com/login)
 
 ---
 
-# Opción Base: Sistema de Gestión de Terceros
+## 🎓 UTN – FRP: Programación III – Trabajo Práctico Final
 
-El sistema tiene como finalidad la administración de pagos a proveedores (terceros) por parte de una facultad.
+El objetivo de este proyecto es demostrar la capacidad de desarrollar una aplicación web completa, integrando diferentes capas de software:
 
-## Requisitos
-
-### 1. Restauración de la Base de Datos
-
-* Restaurar la base de datos proporcionada (estructura y datos).
-
-### 2. Creación del Proyecto
-
-* Crear un proyecto utilizando **Vaadin 25+**.
-* Configurar las dependencias necesarias.
-
-### 3. Gestión de Facultad
-
-Desarrollar una interfaz que permita:
-
-* Crear datos de la facultad.
-* Actualizar datos de la facultad.
-
-### 4. Gestión de Proveedores (Terceros)
-
-Desarrollar una interfaz **CRUD** para:
-
-* Crear proveedores.
-* Consultar proveedores.
-* Modificar proveedores.
-* Eliminar proveedores.
-
-### 5. Gestión de Facturas
-
-Desarrollar una interfaz **CRUD** para el manejo de facturas.
-
-Consideraciones:
-
-* Una factura pertenece a un proveedor (tercero).
-* Una factura está compuesta por uno o más ítems.
-* Debe permitirse registrar, consultar, modificar y eliminar facturas.
-
-### 6. Gestión de Pagos
-
-Desarrollar una interfaz **CRUD** para el manejo de pagos.
-
-Consideraciones:
-
-* Un pago se realiza sobre un proveedor (tercero).
-* Debe permitirse registrar, consultar, modificar y eliminar pagos.
+* 🎨 **Interfaz de usuario (Frontend):** Construida íntegramente con componentes de **Vaadin Hilla** y React.
+* ⚙️ **Lógica de negocio (Backend):** Estructurada mediante el framework **Spring Boot**.
+* 🗄️ **Diseño y gestión de datos:** Persistencia relacional manejada con **PostgreSQL**.
 
 ---
 
-# Opción Avanzada
+## 🎯 Objetivo Principal
 
-Implementar control de acceso al sistema.
+El sistema tiene como finalidad la **administración de pagos a proveedores (terceros)** por parte de una institución o facultad.
 
-## Requisitos
+### Requisitos Funcionales Implementados
 
-### Gestión de Usuarios
-
-Crear una tabla denominada `User` que almacene:
-
-* Usuario
-* Contraseña
-
-### Seguridad
-
-Modificar la aplicación para que:
-
-* Solicite autenticación al ingresar.
-* Permita el acceso únicamente a usuarios registrados.
-* Proteja las funcionalidades del sistema mediante control de acceso.
-
-### Consideraciones
-
-* No se requiere una interfaz CRUD para la administración de usuarios.
-* Los usuarios serán gestionados directamente desde la base de datos.
+1. **Gestión de Facultad 🏛️**
+   * Crear y actualizar datos institucionales.
+2. **Gestión de Proveedores (Terceros) 👥**
+   * Operaciones completas (CRUD): Crear, Consultar, Modificar y Eliminar proveedores.
+3. **Gestión de Facturas 🧾**
+   * Registro y manejo de facturas.
+   * Relaciones: Una factura pertenece a un proveedor y está compuesta por uno o más ítems.
+4. **Gestión de Pagos 💳**
+   * Seguimiento y registro de los pagos realizados a un proveedor.
 
 ---
 
-# Tecnologías Utilizadas
+## 🔒 Opción Avanzada: Seguridad y Control de Acceso
 
-* Java
-* Spring Boot
-* Vaadin Flow / Vaadin Hilla
-* PostgreSQL
-* Maven
+Se ha implementado la **Opción Avanzada** solicitada por la cátedra, agregando control de acceso al sistema:
 
----
-
-# Entidades Principales
-
-## Facultad
-
-Información institucional de la facultad.
-
-## Proveedor (Tercero)
-
-Representa a las personas o empresas proveedoras de bienes o servicios.
-
-## Factura
-
-Documento emitido por un proveedor.
-
-### Relación
-
-* Un proveedor puede tener muchas facturas.
-* Una factura posee uno o más ítems.
-
-## Ítem de Factura
-
-Detalle de productos o servicios incluidos en una factura.
-
-## Pago
-
-Registro de pagos realizados a un proveedor.
-
-### Relación
-
-* Un proveedor puede tener múltiples pagos.
-
-## Usuario (Opción Avanzada)
-
-Entidad utilizada para la autenticación y autorización del sistema.
+* **Autenticación requerida:** El sistema exige credenciales al iniciar. Solo usuarios autorizados y registrados en la tabla `User` pueden ingresar.
+* **Rutas protegidas:** Todas las vistas y endpoints CRUD del sistema están securizados.
 
 ---
 
-# Resultado Esperado
+## 🏗️ Entidades Principales
 
-Al finalizar el trabajo práctico, el sistema deberá permitir:
+* **Facultad:** Información institucional general.
+* **Proveedor (Tercero):** Personas o empresas proveedoras de bienes/servicios.
+* **Factura:** Documento emitido por un proveedor (contiene múltiples Ítems).
+* **Ítem de Factura:** Detalle de productos/servicios.
+* **Pago:** Registro de los pagos realizados a proveedores.
+* **Usuario:** Entidad utilizada para la autenticación en el sistema.
 
-* Administrar los datos de la facultad.
-* Gestionar proveedores.
-* Gestionar facturas y sus ítems.
-* Gestionar pagos.
-* (Opcional avanzado) Gestionar el acceso mediante autenticación de usuarios.
+---
 
-Todo ello utilizando exclusivamente Vaadin, Spring Boot y PostgreSQL.
+## 🛠️ Ejecución Local
 
+Para correr este proyecto en tu entorno local:
+
+1. **Restaurar base de datos:** Asegurate de tener una instancia de PostgreSQL corriendo con la base de datos necesaria.
+2. **Variables de Entorno:** Configura las variables para la conexión (`PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`) o configuralo en `app/src/main/resources/application.properties`.
+3. **Ejecutar el proyecto:** En la terminal, dentro de la carpeta `app/`, ejecutá:
+
+```bash
+mvn clean package -DskipTests
+mvn spring-boot:run
+```
