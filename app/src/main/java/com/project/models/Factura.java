@@ -20,46 +20,37 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-
 
 @Getter
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-@Table(name="facturas")
+@Table(name = "facturas")
 public class Factura {
-	
-	@Id
-	@EqualsAndHashCode.Include
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id_factura")
-	private Long id;
-	
-	@NotNull(message="La fecha de la factura es obligatoria")
-	@Column(name="fecha_factura", nullable = false)
-	private LocalDate fechaFactura;
-	
-	@NotNull(message="El número de la factura es obligatorio")
-	@Column(name="numero")
-	private Integer numeroFactura;
 
-	// RELACION CON PROVEEDOR-TERCERO
-	@NotNull(message = "Debe seleccionar un tercero")
+    @Id
+    @EqualsAndHashCode.Include
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_factura")
+    private Long id;
+
+    @NotNull(message = "La fecha de la factura es obligatoria")
+    @Column(name = "fecha_factura", nullable = false)
+    private LocalDate fechaFactura;
+
+    @NotNull(message = "El número de la factura es obligatorio")
+    @Column(name = "numero")
+    private Integer numeroFactura;
+
+    // RELACION CON PROVEEDOR-TERCERO
+    @NotNull(message = "Debe seleccionar un tercero")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "id_tercero",
-        nullable = false
-    )
+    @JoinColumn(name = "id_tercero", nullable = false)
     private Tercero tercero;
-    
+
     // RELACION CON FACTURA-ITEMS
-    @OneToMany(
-            mappedBy = "factura",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-        )
+    @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FacturaItem> items = new ArrayList<>();
 
 }

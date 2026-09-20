@@ -7,38 +7,27 @@ import com.project.models.Usuario;
 import com.project.models.enums.RolUsuario;
 import com.project.repositories.UsuarioRepository;
 import com.project.ui.base.BaseView;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import jakarta.annotation.security.RolesAllowed;
 
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({ "ADMIN" })
 @Route(value = "usuarios", layout = MainLayout.class)
 @PageTitle("Usuarios")
 @Menu(order = 5, icon = "vaadin:user-star")
 public class UsuarioView extends BaseView {
 
-	private static final long serialVersionUID = 1L;
-	
-	private final UsuarioRepository usuarioRepository;
+    private static final long serialVersionUID = 1L;
+
+    private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
     private Grid<Usuario> grid = new Grid<>(Usuario.class, false);
@@ -61,25 +50,22 @@ public class UsuarioView extends BaseView {
 
         // ================= BUSCADOR =================
         configurarBuscador();
-        
+
         // ================= GRID =================
         configurarGrid();
-        
+
         configurarFormulario();
-        
+
         // ================= BOTONES =================
         add(crearBotonesCrud(
-        		e -> agregarUsuario(),
-		        e -> actualizarUsuario(),
-		        e -> eliminarUsuario(),
-		        e -> limpiarFormulario()
-		        ));
- 
+                e -> agregarUsuario(),
+                e -> actualizarUsuario(),
+                e -> eliminarUsuario(),
+                e -> limpiarFormulario()));
+
         limpiarFormulario();
     }
 
-    
-    
     // ================= CRUD =================
     private void agregarUsuario() {
         if (tfNombreUsuario.isEmpty()) {
@@ -163,7 +149,7 @@ public class UsuarioView extends BaseView {
                 cbRolUser.setValue(usuarioActual.getRolUsuario());
                 tfNombreUsuario.setValue(usuarioActual.getNombreUsuario());
                 pfContraseña.setValue(usuarioActual.getPassword());
-                
+
             } else {
                 limpiarFormulario();
             }
@@ -178,8 +164,7 @@ public class UsuarioView extends BaseView {
             grid.setItems(usuarioRepository.findAll(Sort.by("id").ascending()));
         } else {
             grid.setItems(
-                usuarioRepository.findByNombreUsuarioContainingIgnoreCase(filtro)
-            );
+                    usuarioRepository.findByNombreUsuarioContainingIgnoreCase(filtro));
         }
     }
 
@@ -194,8 +179,7 @@ public class UsuarioView extends BaseView {
 
         form.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
-                new FormLayout.ResponsiveStep("800px", 3)
-        );
+                new FormLayout.ResponsiveStep("800px", 3));
 
         add(form);
     }
@@ -206,7 +190,7 @@ public class UsuarioView extends BaseView {
         tfNombreUsuario.clear();
         pfContraseña.clear();
         cbRolUser.clear();
-        
+
         grid.deselectAll();
     }
 
